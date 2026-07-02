@@ -1,0 +1,50 @@
+.page { min-height: 100vh; background: var(--bg); padding: var(--sp-m) var(--sp-l) 60rpx; box-sizing: border-box; }
+
+.hero { padding: var(--sp-s) 0 var(--sp-l); }
+.title    { font-size: 40rpx; font-weight: 700; color: var(--text); letter-spacing: -0.6rpx; }
+.subtitle { font-size: 24rpx; color: var(--text-3); margin-top: var(--sp-s); }
+
+.tip { text-align: center; color: var(--text-3); font-size: 26rpx; padding: 80rpx 0; }
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 80rpx var(--sp-l);
+}
+.empty-icon  { font-size: 72rpx; margin-bottom: var(--sp-m); }
+.empty-title { font-size: 30rpx; font-weight: 700; color: var(--text); margin-bottom: var(--sp-s); }
+.empty-desc  { font-size: 24rpx; color: var(--text-3); text-align: center; line-height: 40rpx; }
+
+.order-card {
+  background: var(--card-w); border: 1rpx solid var(--border-2);
+  border-radius: var(--r-md);
+  padding: var(--sp-l) var(--sp-l);     /* 24 24 */
+  margin-bottom: var(--sp-m);           /* mb 16 */
+  box-sizing: border-box;
+  box-shadow: 0 2rpx 10rpx rgba(28,26,22,.05);
+}
+.order-card.done { opacity: .6; }
+
+.order-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-m);
+}
+.guest-name { font-size: 28rpx; font-weight: 700; color: var(--text); }
+.order-time { font-size: 21rpx; color: var(--text-3); }
+
+.order-dishes { font-size: 27rpx; color: var(--text-2); line-height: 42rpx; margin-bottom: var(--sp-s); }
+.order-note   { font-size: 22rpx; color: var(--text-3); margin-bottom: var(--sp-m); line-height: 36rpx; }
+
+.order-footer { display: flex; align-items: center; justify-content: space-between; }
+
+.status-badge {
+  height: 36rpx; line-height: 36rpx; padding: 0 var(--sp-m);
+  border-radius: 18rpx; font-size: 21rpx; font-weight: 600;
+}
+.badge-pending { background: var(--amber-bg); color: var(--amber); border: 1rpx solid rgba(185,120,64,.3); }
+.badge-done    { background: var(--primary-bg); color: var(--primary); border: 1rpx solid rgba(74,103,65,.3); }
+
+.done-btn {
+  height: 56rpx; line-height: 54rpx; padding: 0 var(--sp-m);
+  background: var(--primary-bg); border: 1rpx solid var(--primary);
+  border-radius: var(--r-sm); font-size: 24rpx; color: var(--primary); font-weight: 600; box-sizing: border-box;
+}

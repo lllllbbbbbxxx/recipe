@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "Mobile App Design Standards": {
+      "source": "awesome-skills/mobile-app-design",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "d23700b6746068401db5405e80f2ddfca1de064de23c2a6a207b8e24ae3c7173"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "1c27b1774a4ec17ad4556a72e3c0168beab3af0183b2c1b8aa9e320af3ff41ce"
+    }
+  }
+}

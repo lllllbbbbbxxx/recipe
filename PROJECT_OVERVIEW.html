@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今天吃什么 · 项目现状与规划</title>
+  <style>
+    :root {
+      --green: #1D9E75;
+      --green-light: #e8f7f1;
+      --green-mid: #0f8b63;
+      --red: #E5534B;
+      --orange: #f07f3a;
+      --blue: #3a7fb5;
+      --gray: #666;
+      --gray-light: #f5f5f5;
+      --border: #e0e0e0;
+      --text: #222;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; color: var(--text); background: #fafafa; line-height: 1.7; }
+
+    header { background: var(--green); color: white; padding: 36px 48px 28px; }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p { margin-top: 6px; opacity: 0.85; font-size: 0.95rem; }
+    .meta { margin-top: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.22); border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    h2 { font-size: 1.35rem; font-weight: 700; margin: 40px 0 16px; border-left: 4px solid var(--green); padding-left: 12px; }
+    h3 { font-size: 1.05rem; font-weight: 600; margin: 24px 0 10px; color: var(--green-mid); }
+    h4 { font-size: 0.92rem; font-weight: 600; margin: 16px 0 6px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+    p { margin-bottom: 10px; color: #333; font-size: 0.95rem; }
+
+    /* ── 页面卡片 ── */
+    .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 8px; }
+    .page-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .page-card .tag { display: inline-block; background: var(--green-light); color: var(--green-mid); border-radius: 6px; padding: 1px 8px; font-size: 0.78rem; margin-bottom: 8px; font-weight: 600; }
+    .page-card h3 { margin: 0 0 6px; font-size: 1rem; color: var(--text); }
+    .page-card ul { margin: 6px 0 0 16px; font-size: 0.88rem; color: #555; }
+    .page-card li { margin-bottom: 3px; }
+
+    /* ── 架构图 ── */
+    .arch { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 8px; overflow-x: auto; }
+    .arch pre { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82rem; color: #333; white-space: pre; }
+
+    /* ── 数据模型 ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 8px 0; }
+    th { background: var(--gray-light); text-align: left; padding: 8px 12px; font-weight: 600; color: #444; border-bottom: 2px solid var(--border); }
+    td { padding: 7px 12px; border-bottom: 1px solid var(--border); color: #444; vertical-align: top; }
+    td code { background: var(--gray-light); border-radius: 4px; padding: 1px 5px; font-size: 0.83rem; font-family: monospace; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── 功能规划区块 ── */
+    .feature { background: white; border: 1px solid var(--border); border-radius: 12px; margin-top: 20px; overflow: hidden; }
+    .feature-header { padding: 18px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .feature-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+    .feature-num.f1 { background: #fef3e2; color: var(--orange); }
+    .feature-num.f2 { background: #e8f0fe; color: var(--blue); }
+    .feature-title { font-size: 1.1rem; font-weight: 700; }
+    .feature-body { padding: 20px 24px; }
+    .feature-body p { font-size: 0.93rem; }
+
+    .step-list { list-style: none; margin: 10px 0; }
+    .step-list li { display: flex; gap: 12px; margin-bottom: 10px; font-size: 0.9rem; }
+    .step-list li::before { content: attr(data-n); background: var(--green-light); color: var(--green-mid); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; flex-shrink: 0; margin-top: 1px; }
+
+    .action-needed { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 14px 16px; margin: 14px 0; }
+    .action-needed h4 { color: #b07600; margin-bottom: 8px; }
+    .action-needed ul { margin-left: 16px; font-size: 0.9rem; color: #5a4000; }
+    .action-needed li { margin-bottom: 4px; }
+
+    .file-list { font-size: 0.88rem; }
+    .file-list li { margin-bottom: 4px; }
+    .file-list code { background: var(--gray-light); padding: 1px 6px; border-radius: 4px; font-family: monospace; color: var(--green-mid); }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 8px; }
+    @media(max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+    .status-block { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .status-block h3 { margin: 0 0 8px; font-size: 0.95rem; }
+    .done { color: var(--green); font-weight: 600; }
+    .todo { color: var(--orange); font-weight: 600; }
+    .partial { color: var(--blue); font-weight: 600; }
+    .check-list { list-style: none; font-size: 0.88rem; margin: 0; }
+    .check-list li { padding: 3px 0; display: flex; gap: 8px; }
+    .check-list li::before { flex-shrink: 0; }
+    .check-list .done-item::before { content: "✓"; color: var(--green); }
+    .check-list .todo-item::before { content: "○"; color: #aaa; }
+    .check-list .partial-item::before { content: "◑"; color: var(--blue); }
+
+    .warn { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; color: #b91c1c; margin: 12px 0; }
+    .info { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; color: #1e40af; margin: 12px 0; }
+
+    .tech-tag { display: inline-block; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 0.8rem; margin: 2px; font-family: monospace; color: #475569; }
+
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: #999; font-size: 0.83rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>今天吃什么 · 微信小程序</h1>
+  <p>项目现状、架构说明与新功能规划文档（供 AI/开发者快速上手用）</p>
+  <div class="meta">
+    <span class="badge">平台：微信小程序</span>
+    <span class="badge">云环境：cloud1-d2g1doo8z695561f5</span>
+    <span class="badge">存储：微信云开发 (CloudDB + LocalStorage)</span>
+    <span class="badge">文档日期：2026-06-26</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ═══════════════════════════════════ 一、项目概述 ═══════════════════════════ -->
+  <h2>一、项目概述</h2>
+  <p>这是一个帮助用户决定今天吃什么的微信小程序。核心流程：<b>录入会做的菜 → 记录冰箱库存 → 根据库存智能推荐/随机抽取今日菜单 → 汇总购物清单</b>。数据同时存本地缓存（<code>wx.getStorageSync</code>）和微信云数据库，支持多设备同步与备份/恢复。</p>
+
+  <!-- ═══════════════════════════════════ 二、页面结构 ═══════════════════════════ -->
+  <h2>二、页面结构（已实现）</h2>
+  <div class="page-grid">
+    <div class="page-card">
+      <span class="tag">pages/menu</span>
+      <h3>菜谱主页（首页）</h3>
+      <ul>
+        <li>菜谱列表，左滑编辑/删除</li>
+        <li>按类别/标签筛选（荤菜、素菜、汤等）</li>
+        <li>搜索菜名或食材</li>
+        <li>根据冰箱库存显示"可做/差点味/缺主料"</li>
+        <li>冰箱临期食材提醒横条</li>
+        <li>"今日菜单"购物车（汇总所需食材、可复制）</li>
+        <li>"今天抽一顿"快捷入口 → draw 页</li>
+        <li>"生成菜单"自动凑荤素汤配比</li>
+      </ul>
+    </div>
+    <div class="page-card">
+      <span class="tag">pages/add</span>
+      <h3>添加/编辑菜谱</h3>
+      <ul>
+        <li>菜名输入（输完自动填充常见菜的模板）</li>
+        <li>封面图片选择（存本地 + 上传云端 FileID）</li>
+        <li>选择菜品角色（荤菜/素菜/汤/主食/小吃）</li>
+        <li>打标签（最多2个，可自定义）</li>
+        <li>食材列表（名称+用量，可增删）</li>
+        <li>根据食材自动推断角色和标签</li>
+      </ul>
+    </div>
+    <div class="page-card">
+      <span class="tag">pages/fridge</span>
+      <h3>冰箱库存</h3>
+      <ul>
+        <li>手动添加食材（名称+数量，自动分类）</li>
+        <li>首次使用引导：快速勾选常备调料/基础食材</li>
+        <li>按分类（蔬菜/肉蛋/调料/主食/其他）分组展示</li>
+        <li>新鲜度追踪：根据食材类型推算保质期，显示剩余天数</li>
+        <li>临期/过期高亮提醒</li>
+        <li>删除食材</li>
+      </ul>
+    </div>
+    <div class="page-card">
+      <span class="tag">pages/draw</span>
+      <h3>抽卡决策</h3>
+      <ul>
+        <li>转盘动画随机抽一道菜</li>
+        <li>优先抽"冰箱可做"的菜，加权随机</li>
+        <li>显示菜品信息及冰箱匹配状态</li>
+        <li>抽中后可加入菜单</li>
+        <li>支持转发分享</li>
+      </ul>
+    </div>
+    <div class="page-card">
+      <span class="tag">pages/backup</span>
+      <h3>数据备份</h3>
+      <ul>
+        <li>导出为 JSON 文本（复制到剪贴板）</li>
+        <li>粘贴 JSON 文本恢复数据</li>
+        <li>一键云端备份（存到 CloudDB data_backups 集合）</li>
+        <li>显示当前菜谱数量和库存数量</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ 三、技术架构 ═══════════════════════════ -->
+  <h2>三、技术架构</h2>
+  <div class="arch">
+    <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│  微信小程序前端（WXML / WXSS / JS）                              │
+│                                                                   │
+│  pages/menu    pages/add    pages/fridge   pages/draw            │
+│       │             │             │              │                │
+│  ─────────────────────────────────────────────────              │
+│         utils 层（纯 JS，前端调用）                              │
+│  dish-store.js          fridge-store.js    backup-store.js       │
+│  match-utils.js         freshness-utils.js ingredient-classifier │
+│       │                      │                                    │
+└───────┼──────────────────────┼────────────────────────────────── ┘
+        │  wx.cloud API        │  wx.cloud API
+        ▼                      ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  微信云开发（cloud1-d2g1doo8z695561f5）                           │
+│                                                                   │
+│  CloudDB 集合：                  云存储：                         │
+│  ├── dishes              菜谱    ├── dish-covers/    封面图片     │
+│  ├── fridge_items        冰箱库存                                 │
+│  └── data_backups        备份快照                                 │
+│                                                                   │
+│  ⚠ 目前没有 Cloud Functions（云函数）                             │
+└──────────────────────────────────────────────────────────────────┘
+
+本地缓存（wx.getStorageSync）：
+  dishes / dishes_initialized / dishes_cloud_migrated
+  fridge_items / fridge_basic_guide_done
+</pre>
+  </div>
+
+  <!-- ═══════════════════════════════════ 四、数据模型 ═══════════════════════════ -->
+  <h2>四、数据模型</h2>
+  <h3>菜谱（dishes 集合）</h3>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code>id</code></td><td>string</td><td>本地 ID（Date.now()字符串）</td></tr>
+    <tr><td><code>cloudId</code></td><td>string</td><td>CloudDB 文档 _id</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>菜名</td></tr>
+    <tr><td><code>coverImage</code></td><td>string</td><td>云存储 FileID 或本地路径</td></tr>
+    <tr><td><code>mealRole</code></td><td>string</td><td>荤菜/素菜/汤/主食/小吃</td></tr>
+    <tr><td><code>tags</code></td><td>string[]</td><td>最多2个（快手/清淡/下饭/辣/汤/家常/鲜香）</td></tr>
+    <tr><td><code>ingredients</code></td><td><code>{name, amount}[]</code></td><td>食材列表</td></tr>
+    <tr><td><code>createdAt / updatedAt</code></td><td>number</td><td>时间戳（ms）</td></tr>
+  </table>
+
+  <h3>冰箱库存（fridge_items 集合）</h3>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code>id / cloudId</code></td><td>string</td><td>同上</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>食材名</td></tr>
+    <tr><td><code>amount</code></td><td>string</td><td>数量/重量描述（自由文本）</td></tr>
+    <tr><td><code>category</code></td><td>string</td><td>蔬菜/肉蛋/调料/主食/其他</td></tr>
+    <tr><td><code>staple</code></td><td>bool</td><td>是否常备（常备=不追踪新鲜度）</td></tr>
+    <tr><td><code>source</code></td><td>string</td><td>manual / guide（首次引导）</td></tr>
+    <tr><td><code>addedAt</code></td><td>number</td><td>入库时间戳</td></tr>
+    <tr><td><code>shelfLifeDays</code></td><td>number</td><td>保质天数（0=不限）</td></tr>
+    <tr><td><code>expireAt</code></td><td>number</td><td>过期时间戳（addedAt + shelfLifeDays*DAY）</td></tr>
+    <tr><td><code>freshnessStatus</code></td><td>string</td><td>normal / soon / expired（计算字段）</td></tr>
+  </table>
+
+  <!-- ═══════════════════════════════════ 五、核心逻辑 ═══════════════════════════ -->
+  <h2>五、核心逻辑说明</h2>
+
+  <div class="two-col">
+    <div class="status-block">
+      <h3>匹配算法（match-utils.js）</h3>
+      <p style="font-size:0.88rem;">把菜谱食材分为 4 级：<b>main（主料）</b>→ <b>required（必要）</b>→ <b>optional（配料）</b>→ <b>seasoning（调料）</b>。与冰箱食材做模糊匹配（包含关系）。</p>
+      <ul class="check-list" style="margin-top:8px;">
+        <li class="done-item"><b>canCook</b> = 全部齐</li>
+        <li class="done-item"><b>canDraw</b> = 主料+必要料齐（缺配料/调料也可做）</li>
+        <li class="done-item"><b>almostReady</b> = canDraw 但有缺</li>
+      </ul>
+    </div>
+    <div class="status-block">
+      <h3>新鲜度系统（freshness-utils.js）</h3>
+      <p style="font-size:0.88rem;">按食材名称 / 类别推算默认保质天数，入库时计算 expireAt。展示剩余天数，2天内=soon，过期=expired。过期食材不参与匹配。</p>
+      <p style="font-size:0.88rem;margin-top:6px;">菜单页首部显示临期食材提醒，推荐优先用快过期食材做菜。</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ 六、当前完成情况 ═══════════════════════ -->
+  <h2>六、当前完成情况</h2>
+  <div class="two-col">
+    <div class="status-block">
+      <h3>✓ 已完成</h3>
+      <ul class="check-list">
+        <li class="done-item">菜谱 CRUD（含封面图、模板自动填充）</li>
+        <li class="done-item">本地 + 云端双写同步</li>
+        <li class="done-item">冰箱库存手动录入与管理</li>
+        <li class="done-item">新鲜度追踪与提醒</li>
+        <li class="done-item">冰箱-菜谱匹配推荐</li>
+        <li class="done-item">随机抽卡（加权，优先可做菜）</li>
+        <li class="done-item">今日菜单购物车 + 食材汇总复制</li>
+        <li class="done-item">JSON 备份/恢复 + 云端快照</li>
+        <li class="done-item">首次使用向导（常备食材快速录入）</li>
+      </ul>
+    </div>
+    <div class="status-block">
+      <h3>○ 待开发</h3>
+      <ul class="check-list">
+        <li class="todo-item">冰箱截图 OCR 识别导入</li>
+        <li class="todo-item">菜单分享（生成可分享链接）</li>
+        <li class="todo-item">他人选菜下单流程</li>
+        <li class="todo-item">厨师接单通知（微信订阅消息）</li>
+        <li class="todo-item">订单管理页面</li>
+        <li class="todo-item">冰箱食材编辑（修改数量/过期日期）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ 七、功能规划 ═══════════════════════════ -->
+  <h2>七、新功能规划</h2>
+
+  <!-- ── 功能1 ── -->
+  <div class="feature">
+    <div class="feature-header">
+      <div class="feature-num f1">1</div>
+      <div>
+        <div class="feature-title">冰箱截图 OCR 识别导入</div>
+        <div style="font-size:0.88rem;color:#666;margin-top:2px;">拍一张冰箱/采购小票照片，自动识别食材并批量加入库存</div>
+      </div>
+    </div>
+    <div class="feature-body">
+
+      <h3>用户操作流程</h3>
+      <ol class="step-list">
+        <li data-n="1">冰箱页新增"扫描导入"按钮，用户选择/拍照</li>
+        <li data-n="2">图片上传到云存储，调用云函数执行 OCR 识别</li>
+        <li data-n="3">OCR 返回识别出的食材名称列表，展示确认弹窗</li>
+        <li data-n="4">用户可勾选/编辑/删除误识别项，确认后批量写入冰箱库存</li>
+      </ol>
+
+      <h3>技术实现</h3>
+      <p>核心障碍：微信小程序前端不能直接调用第三方 HTTP API，需要通过<b>云函数</b>作为代理。</p>
+      <div class="two-col" style="margin-top:12px;">
+        <div class="status-block">
+          <h4>方案 A（推荐）：调用 Claude Vision API</h4>
+          <p style="font-size:0.88rem;">云函数接收图片 base64，调用 <code>claude-haiku-4-5</code>（成本低、速度快），prompt 为"识别图中食材，输出 JSON 数组"。</p>
+          <p style="font-size:0.88rem;margin-top:6px;"><b>优点：</b>识别准确，可理解中文超市小票、冰箱摆放照。<br><b>缺点：</b>需要 Anthropic API Key。</p>
+        </div>
+        <div class="status-block">
+          <h4>方案 B：腾讯云 OCR</h4>
+          <p style="font-size:0.88rem;">微信云开发内置腾讯云 OCR（通用印刷体识别），不需要额外账号，但识别结果是原始文字，需要再用规则/关键词提取食材名称。</p>
+          <p style="font-size:0.88rem;margin-top:6px;"><b>优点：</b>无需额外 API Key。<br><b>缺点：</b>冰箱照片识别率低，需要后处理逻辑。</p>
+        </div>
+      </div>
+
+      <h3>需要新建/修改的文件</h3>
+      <ul class="file-list">
+        <li><code>cloudfunctions/ocrFridge/index.js</code>（新建）— 云函数，调用 OCR/Vision API，返回食材列表</li>
+        <li><code>pages/fridge/fridge.js</code>（修改）— 新增"扫描"入口、处理识别结果、批量保存</li>
+        <li><code>pages/fridge/fridge.wxml</code>（修改）— 扫描按钮 + 确认弹窗 UI</li>
+        <li><code>pages/fridge/fridge.wxss</code>（修改）— 对应样式</li>
+      </ul>
+
+      <div class="action-needed">
+        <h4>⚠ 需要你手动操作的部分</h4>
+        <ul>
+          <li><b>创建云函数目录：</b>在微信开发者工具中，右键项目根目录 → "新建 Node.js 云函数" → 命名为 <code>ocrFridge</code></li>
+          <li><b>选择 OCR 方案后：</b>
+            <ul style="margin:6px 0 0 16px;">
+              <li>方案 A：在云函数里添加 <code>ANTHROPIC_API_KEY</code> 环境变量（在微信云开发控制台 → 云函数 → 函数配置 → 环境变量）</li>
+              <li>方案 B：在微信云开发控制台开通"腾讯云 OCR"扩展能力</li>
+            </ul>
+          </li>
+          <li><b>上传并部署云函数：</b>右键 <code>ocrFridge</code> 文件夹 → "上传并部署"</li>
+          <li><b>在 <code>app.json</code> 的 <code>requiredPrivateInfos</code> 中</b>确认 <code>chooseMedia</code> 权限（微信可能要求声明）</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 功能2 ── -->
+  <div class="feature">
+    <div class="feature-header">
+      <div class="feature-num f2">2</div>
+      <div>
+        <div class="feature-title">菜单分享 + 他人选菜下单</div>
+        <div style="font-size:0.88rem;color:#666;margin-top:2px;">分享自己会做的菜给朋友，朋友点选后厨师收到通知/详情</div>
+      </div>
+    </div>
+    <div class="feature-body">
+
+      <h3>角色说明</h3>
+      <div class="two-col">
+        <div class="status-block">
+          <h4>🍳 厨师（分享者）</h4>
+          <ul class="check-list">
+            <li class="done-item">已有菜谱库</li>
+            <li class="todo-item">点"分享菜单"生成小程序卡片/链接</li>
+            <li class="todo-item">接收下单通知（订阅消息）</li>
+            <li class="todo-item">查看下单详情页</li>
+          </ul>
+        </div>
+        <div class="status-block">
+          <h4>🙋 食客（接收者）</h4>
+          <ul class="check-list">
+            <li class="todo-item">打开分享链接，看到厨师的菜谱</li>
+            <li class="todo-item">勾选想吃的菜，填写备注/人数</li>
+            <li class="todo-item">提交"选菜单"</li>
+            <li class="todo-item">看到提交成功确认</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>用户操作流程</h3>
+      <ol class="step-list">
+        <li data-n="1">厨师在菜单页点"分享菜单"，小程序生成包含厨师 openid 的分享卡片（<code>wx.shareAppMessage</code>）</li>
+        <li data-n="2">食客点开链接，进入 <code>pages/share/share?chef={openid}</code>，看到厨师的菜谱列表（只读）</li>
+        <li data-n="3">食客勾选想吃的菜，填写姓名/备注，点"提交选菜"</li>
+        <li data-n="4">订单写入 CloudDB <code>orders</code> 集合，同时调用云函数触发微信订阅消息推送给厨师</li>
+        <li data-n="5">厨师收到微信通知卡片，点开进入 <code>pages/orders/orders</code> 查看详情</li>
+      </ol>
+
+      <h3>技术实现</h3>
+      <div class="info">微信小程序可通过 <code>onLoad(options)</code> 的 <code>scene</code>（扫码场景）或 <code>query</code> 参数接收外部传入的数据，用于区分是厨师自己访问还是食客通过分享链接进入。<code>wx.shareAppMessage</code> 的 path 参数可携带 chef openid。</div>
+
+      <div class="two-col" style="margin-top:8px;">
+        <div class="status-block">
+          <h4>新 CloudDB 集合</h4>
+          <p style="font-size:0.88rem;"><b>orders</b>：{id, chefOpenid, guestName, dishes: [{id, name}], note, status, createdAt}</p>
+          <p style="font-size:0.88rem;margin-top:6px;">权限设置：<br>- 厨师（openid匹配）可读所有自己的订单<br>- 食客可写（匿名创建）</p>
+        </div>
+        <div class="status-block">
+          <h4>通知机制</h4>
+          <p style="font-size:0.88rem;"><b>微信订阅消息</b>（<code>wx.requestSubscribeMessage</code>）：厨师首次使用时授权订阅，之后有新订单就能收到微信卡片通知。</p>
+          <p style="font-size:0.88rem;margin-top:6px;"><b>备用方案（更简单）：</b>不用通知，厨师打开小程序时自动刷新显示未读订单数。</p>
+        </div>
+      </div>
+
+      <h3>需要新建/修改的文件</h3>
+      <ul class="file-list">
+        <li><code>pages/share/share.js / .wxml / .wxss / .json</code>（新建）— 食客查看菜单 + 选菜下单页</li>
+        <li><code>pages/orders/orders.js / .wxml / .wxss / .json</code>（新建）— 厨师查看订单列表页</li>
+        <li><code>cloudfunctions/notifyOrder/index.js</code>（新建）— 云函数，调用微信订阅消息 API 推送通知</li>
+        <li><code>pages/menu/menu.js</code>（修改）— 新增"分享菜单"按钮和 <code>onShareAppMessage</code> 携带 chef openid</li>
+        <li><code>app.json</code>（修改）— 新增两个页面路径</li>
+      </ul>
+
+      <div class="action-needed">
+        <h4>⚠ 需要你手动操作的部分</h4>
+        <ul>
+          <li><b>如需推送通知：</b>登录 <a href="https://mp.weixin.qq.com" target="_blank">微信公众平台</a> → 功能 → 订阅消息，申请一个"新订单"消息模板，获取 <b>templateId</b>（字段一般包含：菜品名称、下单人、备注）</li>
+          <li><b>在微信云开发控制台新建 CloudDB 集合：</b><code>orders</code>，权限设置为"所有用户可写、仅创建者可读"（或自定义）</li>
+          <li><b>创建并部署云函数 <code>notifyOrder</code></b>（同上，需要在云函数里调用 <code>openapi.subscribeMessage.send</code>，需在云开发控制台开启 openapi 权限）</li>
+          <li><b>如果只做"不推送通知"的简化版，</b>则无需操作微信平台，只需新建 CloudDB <code>orders</code> 集合即可</li>
+        </ul>
+      </div>
+
+      <div class="warn">⚠ 注意：微信订阅消息要求用户主动授权（弹窗点允许），且每次触发只能发一条。厨师侧需要在某个操作时触发一次 <code>wx.requestSubscribeMessage</code> 调用进行授权（建议在首次进入订单页时弹出）。</div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ 八、实现优先级建议 ═══════════════════════ -->
+  <h2>八、实现优先级建议</h2>
+  <p>两个功能可以独立开发，没有依赖关系。建议顺序：</p>
+  <ol class="step-list">
+    <li data-n="1"><b>先做功能2（分享下单）的核心路径，不含通知：</b>分享页 + 提交订单 + 厨师查看订单列表。这只需要新建几个页面和一个 CloudDB 集合，不依赖任何第三方 API。</li>
+    <li data-n="2"><b>再补全功能2的通知：</b>申请订阅消息模板后，加上云函数推送。</li>
+    <li data-n="3"><b>然后做功能1（OCR）：</b>先确定用哪个 AI API，再写云函数，最后连接前端 UI。</li>
+  </ol>
+
+  <!-- ═══════════════════════════════════ 九、开发注意事项 ═══════════════════════ -->
+  <h2>九、开发注意事项</h2>
+  <ul style="font-size:0.92rem;margin-left:20px;color:#333;">
+    <li style="margin-bottom:6px;"><b>云函数必须在微信开发者工具中创建目录并上传部署，</b>不能只在编辑器里写文件。</li>
+    <li style="margin-bottom:6px;"><b>openid 获取：</b>在小程序前端调用 <code>wx.cloud.callFunction({ name: 'getOpenid' })</code> 可获取当前用户 openid（需有对应云函数，或直接用 CloudDB 查询时 <code>_openid</code> 字段会自动填充）。</li>
+    <li style="margin-bottom:6px;"><b>分享链接不能携带任意字符串，</b>path 参数需 URL encode，且总长度有限制（约 1024 字节）。如果 openid 太长，可以考虑生成一个短 token 存到 CloudDB 再通过 token 查厨师信息。</li>
+    <li style="margin-bottom:6px;"><b>CloudDB 权限：</b><code>orders</code> 集合建议"所有用户可写（仅限自己创建的记录），管理员/指定 openid 可读全部"。实际上只能用"所有用户"权限，厨师过滤自己的订单通过 <code>where({ chefOpenid: '{openid}' })</code> 实现。</li>
+    <li style="margin-bottom:6px;"><b>当前没有使用 tabBar</b>（底部导航），页面间用 <code>wx.navigateTo</code>，新页面沿用这种方式即可。</li>
+    <li style="margin-bottom:6px;"><b>本地缓存 key 已有：</b><code>dishes</code>, <code>fridge_items</code>, <code>dishes_initialized</code>, <code>dishes_cloud_migrated</code>, <code>fridge_basic_guide_done</code>。新功能新增 key 时注意不要冲突。</li>
+  </ul>
+
+  <div style="margin-top:32px;padding:20px;background:white;border:1px solid var(--border);border-radius:12px;">
+    <h3 style="margin:0 0 10px;color:var(--green-mid);">使用技术栈汇总</h3>
+    <div>
+      <span class="tech-tag">微信小程序原生框架</span>
+      <span class="tech-tag">wx.cloud (CloudDB)</span>
+      <span class="tech-tag">wx.cloud.uploadFile</span>
+      <span class="tech-tag">wx.getStorageSync</span>
+      <span class="tech-tag">wx.shareAppMessage</span>
+      <span class="tech-tag">Cloud Functions (Node.js)</span>
+      <span class="tech-tag">wx.requestSubscribeMessage（计划）</span>
+      <span class="tech-tag">Claude API / 腾讯云OCR（计划）</span>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  本文档由 Claude Sonnet 4.6 自动生成 · 2026-06-26 · 仅供 AI/开发者参考，非用户向文档
+</footer>
+
+</body>
+</html>

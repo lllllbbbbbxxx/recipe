@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="hero">
+    <view class="title">数据安全</view>
+    <view class="subtitle">菜谱和库存会优先保存到云端，也可以手动导出一份。</view>
+  </view>
+
+  <view class="summary">
+    <view class="summary-item">
+      <view class="summary-num">{{dishCount}}</view>
+      <view class="summary-label">菜谱</view>
+    </view>
+    <view class="summary-item">
+      <view class="summary-num">{{fridgeItemCount}}</view>
+      <view class="summary-label">库存</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">备份</view>
+    <view class="section-desc">复制导出文本后，可以自己保存到微信收藏、备忘录或文件里。</view>
+    <view class="primary-btn" bindtap="copyExport">复制导出数据</view>
+    <view class="secondary-btn" bindtap="saveCloudBackup">保存一份云端快照</view>
+    <view class="tip">{{lastBackupText}}</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">恢复</view>
+    <view class="section-desc">把之前复制的备份文本粘贴到这里，可以恢复菜谱和库存。</view>
+    <textarea class="import-box" value="{{importText}}" bindinput="onImportInput" placeholder="粘贴备份文本" placeholder-style="color: #aaa;" />
+    <view class="danger-btn" bindtap="restoreBackup">从文本恢复</view>
+  </view>
+
+  <view class="note">
+    <view>开发者恢复：云数据库可按用户 _openid 查询 dishes、fridge_items 和 data_backups。</view>
+    <view>误删后越早联系越好，避免新的操作覆盖旧数据。</view>
+  </view>
+</view>

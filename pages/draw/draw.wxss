@@ -1,0 +1,100 @@
+.page { min-height: 100vh; background: var(--bg); padding: var(--sp-m) var(--sp-l) 60rpx; box-sizing: border-box; }
+
+/* ── 头部 ── */
+.draw-header { padding: var(--sp-s) 0 var(--sp-l); }
+.eyebrow  { font-size: 20rpx; font-weight: 500; color: var(--text-3); letter-spacing: 5rpx; text-transform: uppercase; }
+.title    { font-size: 44rpx; font-weight: 700; color: var(--text); letter-spacing: -0.6rpx; margin-top: var(--sp-s); }
+.subtitle { font-size: 25rpx; color: var(--text-2); margin-top: var(--sp-s); }
+
+/* ── 抽牌舞台 ── */
+.stage {
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--sp-xl) 0;
+}
+.card-stack { position: relative; width: 460rpx; height: 600rpx; }
+
+.back-card {
+  position: absolute; top: 0; left: 50%;
+  width: 420rpx; height: 580rpx;
+  border-radius: var(--r-lg);
+  box-shadow: 0 6rpx 20rpx rgba(43,40,35,.10);
+}
+.back-one { background: var(--primary-bg); transform: translateX(-50%) rotate(-5deg); }
+.back-two { background: var(--amber-bg);   transform: translateX(-50%) rotate(3deg); }
+
+.draw-card {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 440rpx; height: 590rpx;
+  background: var(--card-w);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12rpx 36rpx rgba(43,40,35,.16);
+  overflow: hidden; box-sizing: border-box;
+  display: flex; flex-direction: column;
+}
+.draw-card.drawing { animation: card-flip .45s ease; }
+@keyframes card-flip {
+  0%   { transform: translateX(-50%) rotateY(0); }
+  50%  { transform: translateX(-50%) rotateY(90deg); }
+  100% { transform: translateX(-50%) rotateY(0); }
+}
+
+.card-cover {
+  width: 100%; height: 300rpx; display: block; flex-shrink: 0;
+}
+.fallback-cover {
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 88rpx; font-weight: 700;
+}
+.fallback-cover.thumb-green { background: linear-gradient(135deg,#6E8A6C,#566F54); }
+.fallback-cover.thumb-red   { background: linear-gradient(135deg,#C2705F,#A8534A); }
+.fallback-cover.thumb-blue  { background: linear-gradient(135deg,#7E97AA,#647F94); }
+.fallback-cover.thumb-light { background: linear-gradient(135deg,#8FA67E,#6E8A6C); }
+.fallback-cover.thumb-gold  { background: linear-gradient(135deg,#CF9460,#BE7A53); }
+
+.card-body { flex: 1; padding: var(--sp-l); display: flex; flex-direction: column; }
+.result-label { font-size: 20rpx; font-weight: 500; color: var(--text-3); letter-spacing: 3rpx; text-transform: uppercase; }
+.card-body .dish-name { font-size: 38rpx; font-weight: 700; color: var(--text); margin: var(--sp-s) 0; }
+.card-body .dish-meta { font-size: 24rpx; color: var(--text-2); line-height: 36rpx; }
+
+.match-row { display: flex; align-items: center; gap: var(--sp-s); margin-top: var(--sp-m); }
+.match-badge {
+  height: 36rpx; line-height: 36rpx; padding: 0 var(--sp-m);
+  border-radius: 18rpx; font-size: 22rpx; font-weight: 600; color: #fff; flex-shrink: 0;
+}
+.match-detail { font-size: 22rpx; color: var(--text-3); }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-top: var(--sp-m); }
+.tag {
+  height: 34rpx; line-height: 34rpx; padding: 0 var(--sp-m);
+  border-radius: 17rpx; background: var(--bg);
+  color: var(--text-2); font-size: 21rpx; font-weight: 500;
+}
+.role-tag { background: var(--primary-bg); color: var(--primary); }
+
+/* ── 操作按钮 ── */
+.actions { display: flex; flex-direction: column; gap: var(--sp-s); margin-bottom: var(--sp-l); }
+.draw-btn {
+  height: 92rpx; line-height: 92rpx; text-align: center;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-md); font-size: 30rpx; font-weight: 600;
+  box-shadow: 0 6rpx 20rpx rgba(79,107,82,.3);
+}
+.actions .add-btn {
+  height: 92rpx; line-height: 92rpx; text-align: center;
+  background: var(--primary-bg); color: var(--primary);
+  border-radius: var(--r-md); font-size: 29rpx; font-weight: 600;
+}
+.actions .add-btn.btn-disabled { background: var(--bg2); color: var(--text-3); }
+.share-btn {
+  height: 92rpx; line-height: 92rpx; text-align: center;
+  background: var(--card-w); color: var(--text-2);
+  border-radius: var(--r-md); font-size: 27rpx; font-weight: 500;
+  box-shadow: 0 1rpx 3rpx rgba(43,40,35,.08);
+}
+.share-btn::after { border: none; }
+
+/* ── 候选信息 ── */
+.pool-info {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--sp-s); font-size: 23rpx; color: var(--text-3);
+}

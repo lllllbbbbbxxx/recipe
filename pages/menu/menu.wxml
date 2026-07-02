@@ -1,0 +1,143 @@
+<view class="page">
+
+<!-- 顶部 header -->
+<view class="shop-header">
+  <view class="shop-row">
+    <view class="brand">
+      <view class="shop-name">今天吃什么</view>
+      <view class="shop-desc">TODAY'S MENU</view>
+    </view>
+    <view class="header-actions">
+      <view class="hbtn hbtn-orders" bindtap="goOrders">接单</view>
+      <view class="hbtn hbtn-fridge" bindtap="goFridge">冰箱</view>
+      <view class="hbtn hbtn-add" bindtap="goAdd">+ 菜谱</view>
+    </view>
+  </view>
+
+  <!-- 描线食物插画 -->
+  <view class="deco-wrap">
+    <image class="deco-svg" src="/pages/menu/deco-food.svg" mode="widthFix"/>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="search-bar" bindtap="closeSwipe">
+    <input class="search-input" placeholder="搜菜名或食材…" placeholder-style="color:#9e9486;font-weight:400;" bindinput="onSearch" value="{{searchValue}}"/>
+  </view>
+</view>
+
+<!-- 今日决策 -->
+<view class="decision-bar">
+  <view class="decision-btn primary-decision" bindtap="goDraw">今天抽一顿</view>
+  <view class="decision-btn" bindtap="generateTodayMenu">生成菜单</view>
+</view>
+
+<view class="order-layout">
+  <!-- 分类栏 -->
+  <scroll-view class="category-list" scroll-y>
+    <view
+      wx:for="{{categoryFilters}}"
+      wx:key="name"
+      class="category-item {{item.active ? 'category-active' : ''}}"
+      bindtap="toggleFilter"
+      data-tag="{{item.name}}"
+    >
+      <view class="category-marker"></view>
+      <text>{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 菜谱列表 -->
+  <scroll-view class="dish-list" scroll-y>
+    <view wx:if="{{isDishListEmpty}}" class="empty">没有找到匹配的菜</view>
+    <view wx:for="{{filteredDishes}}" wx:key="viewKey" class="swipe-item">
+      <view class="swipe-actions">
+        <view class="swipe-action edit-action" bindtap="editDish" data-id="{{item.id}}">编辑</view>
+        <view class="swipe-action delete-action" bindtap="deleteDish" data-id="{{item.id}}">删除</view>
+      </view>
+      <view
+        class="dish-card {{item.selected ? 'selected' : ''}} {{item.swiped ? 'swiped' : ''}}"
+        bindtouchstart="onDishTouchStart"
+        bindtouchend="onDishTouchEnd"
+        catchtap="onDishCardTap"
+        data-id="{{item.id}}"
+      >
+        <image wx:if="{{item.coverImage}}" class="dish-cover" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view wx:else class="dish-thumb {{item.thumbClass}}">
+          <text>{{item.thumbText}}</text>
+        </view>
+        <view class="dish-info">
+          <view class="dish-name">{{item.name}}</view>
+          <view class="dish-match">
+            <text class="match-dot {{item.matchClass}}"></text>
+            <text class="match-detail">{{item.missingText || item.matchText}}</text>
+          </view>
+          <view class="dish-tags">
+            <text wx:if="{{item.mealRole}}" class="dish-tag role-tag">{{item.mealRole}}</text>
+            <text wx:for="{{item.tagViews}}" wx:key="key" wx:for-item="tag" class="dish-tag">{{tag.name}}</text>
+          </view>
+        </view>
+        <view
+          class="add-btn {{item.selected ? 'added' : ''}}"
+          catchtap="toggleCart" data-id="{{item.id}}"
+        >{{item.selectedText}}</view>
+      </view>
+    </view>
+
+    <!-- 划到底部才出现的备份入口 -->
+    <view wx:if="{{!isDishListEmpty}}" class="list-footer">
+      <view class="footer-backup" bindtap="goBackup">备份数据</view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 底部今日菜单栏 -->
+<view class="cart-bar">
+  <view class="cart-summary" bindtap="toggleCartPanel">
+    <view class="cart-icon">{{cartCount}}</view>
+    <view>
+      <view class="cart-main">今日菜单{{cartCountText}}</view>
+      <view class="cart-sub">{{cartHint}}</view>
+    </view>
+  </view>
+  <view class="checkout-btn {{isCartEmpty ? 'checkout-disabled' : ''}}" bindtap="toggleCartPanel">看食材</view>
+</view>
+
+<!-- 底部菜单面板 -->
+<view class="cart-panel {{showCart ? 'show' : ''}}">
+  <view class="cart-header">
+    <text class="cart-title">今日菜单</text>
+    <view class="cart-actions">
+      <text wx:if="{{!isCartEmpty}}" bindtap="copyIngredients" class="action-text">复制食材</text>
+      <text bindtap="clearCart" class="action-text">清空</text>
+      <text bindtap="toggleCartPanel" class="action-close">✕</text>
+    </view>
+  </view>
+
+  <button class="share-menu-btn" open-type="share">📤 分享菜单给朋友点单</button>
+  <view wx:if="{{isCartEmpty}}" class="cart-empty">点击菜谱右侧 + 加入菜单</view>
+
+  <view wx:else>
+    <!-- 已选菜品 -->
+    <view class="selected-list">
+      <view wx:for="{{cart}}" wx:key="viewKey" class="selected-item">
+        <text>{{item.name}}</text>
+        <text bindtap="removeFromCart" data-id="{{item.id}}" class="remove-btn">×</text>
+      </view>
+    </view>
+
+    <!-- 食材汇总 -->
+    <view class="ing-section">
+      <view class="ing-title">所需食材</view>
+      <view wx:for="{{cartIngredients}}" wx:key="name" class="ing-row">
+        <view class="ing-dot"></view>
+        <text class="ing-name">{{item.name}}</text>
+        <text class="ing-amount">{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 遮罩 -->
+<view class="overlay {{showCart ? 'show' : ''}}" bindtap="toggleCartPanel"></view>
+
+</view>

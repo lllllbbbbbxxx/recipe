@@ -1,0 +1,140 @@
+<view class="page">
+  <view class="form-section">
+    <view class="section-title">添加食材</view>
+    <input class="input" placeholder="食材名，例如：鸡蛋" placeholder-style="color: #999; font-weight: 400;" value="{{name}}" bindinput="onNameInput" />
+    <input class="input amount-input" placeholder="数量，可选，例如：3个" placeholder-style="color: #999; font-weight: 400;" value="{{amount}}" bindinput="onAmountInput" />
+    <view class="category-row">
+      <view
+        wx:for="{{categoryOptions}}"
+        wx:key="name"
+        class="category-chip {{item.active ? 'category-active' : ''}}"
+        data-category="{{item.name}}"
+        bindtap="selectCategory"
+      >{{item.name}}</view>
+    </view>
+    <view class="scan-row">
+      <view class="scan-btn" bindtap="scanOcr">📷 拍照/截图识别食材</view>
+    </view>
+    <view class="save-btn" bindtap="saveFridgeItem">加入冰箱</view>
+  </view>
+
+  <!-- OCR 识别结果弹窗 -->
+  <view wx:if="{{showOcrModal}}" class="ocr-mask">
+    <view class="ocr-panel">
+      <view class="ocr-title">识别到的食材</view>
+      <view class="ocr-desc">已自动筛掉价格、店名等噪声，并勾选了像食材的项，确认后点「加入冰箱」</view>
+      <view
+        wx:for="{{ocrResults}}"
+        wx:key="index"
+        class="ocr-item"
+        bindtap="toggleOcrItem"
+        data-index="{{index}}"
+      >
+        <view class="ocr-check {{item.selected ? 'on' : ''}}">{{item.selected ? '✓' : ''}}</view>
+        <text class="ocr-item-name">{{item.text}}</text>
+        <text wx:if="{{item.amount}}" class="ocr-item-amount">{{item.amount}}</text>
+      </view>
+      <view wx:if="{{!ocrResults.length}}" class="ocr-empty">没有识别到文字，换张清晰的图片试试</view>
+      <view class="ocr-actions">
+        <view class="ocr-cancel" bindtap="closeOcrModal">取消</view>
+        <view class="ocr-confirm" bindtap="confirmOcrItems">加入冰箱</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!isEmpty}}" class="summary-section">
+    <view class="summary-head">
+      <view class="section-title">这两天先用什么</view>
+      <view class="summary-pill">{{expiredCount}} 过期 / {{soonCount}} 临期</view>
+    </view>
+    <view class="summary-desc">{{reminderText}}</view>
+    <view wx:if="{{urgentItems.length}}" class="urgent-list">
+      <view wx:for="{{urgentItems}}" wx:key="viewKey" class="urgent-item">
+        <view>
+          <view class="urgent-name">{{item.name}}</view>
+          <view class="urgent-meta">{{item.category}} {{item.amount}}</view>
+        </view>
+        <view class="urgent-tag {{item.urgentClass}}">{{item.freshnessText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="list-section">
+    <view class="section-title">已有食材</view>
+    <view wx:if="{{isEmpty}}" class="empty-fridge">
+      <view class="empty-fridge-icon">🧺</view>
+      <view class="empty-fridge-text">冰箱还是空的</view>
+      <view class="empty-fridge-quick" bindtap="openGuide">⚡ 快捷添加常备食材</view>
+    </view>
+    <view wx:for="{{itemGroups}}" wx:key="name" wx:for-item="group" class="item-group">
+      <view class="item-group-title" bindtap="toggleGroup" data-name="{{group.name}}">
+        <text class="group-chevron {{group.collapsed ? '' : 'open'}}">▸</text>
+        <text class="group-name">{{group.name}}</text>
+        <text class="item-count">{{group.count}}</text>
+      </view>
+      <block wx:if="{{!group.collapsed}}">
+        <view wx:for="{{group.items}}" wx:key="viewKey" wx:for-item="item" class="item-swipe">
+          <view wx:if="{{openedItemId === item.id}}" class="item-del-action" data-id="{{item.id}}" bindtap="deleteFridgeItem">删除</view>
+          <view
+            class="item-row {{openedItemId === item.id ? 'swiped' : ''}}"
+            bindtouchstart="onItemTouchStart"
+            bindtouchend="onItemTouchEnd"
+            data-id="{{item.id}}"
+          >
+            <view class="item-main">
+              <view class="item-name">{{item.name}}</view>
+              <view class="item-meta {{item.freshnessClass}}">{{item.freshnessText}}</view>
+            </view>
+            <!-- 非常备：可编辑数量；常备：直接显示已有数量(若有) -->
+            <input
+              wx:if="{{!item.staple}}"
+              class="item-qty-input"
+              type="text"
+              value="{{item.amount}}"
+              placeholder="数量"
+              placeholder-class="qty-ph"
+              data-id="{{item.id}}"
+              bindblur="onItemQtyInput"
+              confirm-type="done"
+              bindconfirm="onItemQtyInput"
+            />
+            <text wx:elif="{{item.qtyText}}" class="item-qty">{{item.qtyText}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view wx:if="{{showGuide}}" class="guide-mask">
+    <view class="guide-panel">
+      <view class="guide-title">你家里一般会有这些吗？</view>
+      <view class="guide-subtitle">勾选一下，帮你快速建立库存</view>
+
+      <view wx:for="{{guideGroups}}" wx:key="name" wx:for-item="group" class="guide-group">
+        <view class="guide-group-head">
+          <text class="guide-group-title">{{group.name}}</text>
+          <text class="guide-group-desc">{{group.desc}}</text>
+        </view>
+        <view class="guide-items">
+          <view
+            wx:for="{{group.items}}"
+            wx:key="viewKey"
+            wx:for-item="guideItem"
+            class="guide-chip {{guideItem.selected ? 'guide-chip-active' : ''}}"
+            data-group="{{guideItem.groupIndex}}"
+            data-index="{{guideItem.itemIndex}}"
+            bindtap="toggleGuideItem"
+          >
+            <text class="check-dot">{{guideItem.selected ? '✓' : ''}}</text>
+            <text>{{guideItem.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="guide-actions">
+        <view class="skip-btn" bindtap="closeGuide">跳过</view>
+        <view class="guide-primary" bindtap="addBasicInventory">一键加入库存</view>
+      </view>
+    </view>
+  </view>
+</view>

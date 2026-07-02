@@ -1,0 +1,61 @@
+.page { min-height: 100vh; background: var(--bg); padding: var(--sp-m) var(--sp-l) 80rpx; box-sizing: border-box; }
+
+/* ── 头部 ── */
+.hero { padding: var(--sp-s) 0 var(--sp-l); }
+.title    { font-size: 40rpx; font-weight: 700; color: var(--text); letter-spacing: -0.6rpx; }
+.subtitle { font-size: 24rpx; color: var(--text-2); margin-top: var(--sp-s); line-height: 36rpx; }
+
+/* ── 数量统计 ── */
+.summary {
+  display: flex; gap: var(--sp-m); margin-bottom: var(--sp-l);
+}
+.summary-item {
+  flex: 1; background: var(--card-w); border-radius: var(--r-md);
+  padding: var(--sp-l); text-align: center; box-sizing: border-box;
+  box-shadow: 0 1rpx 3rpx rgba(43,40,35,.06);
+}
+.summary-num   { font-size: 52rpx; font-weight: 700; color: var(--primary); letter-spacing: -1rpx; }
+.summary-label { font-size: 23rpx; color: var(--text-3); margin-top: var(--sp-s); }
+
+/* ── 分区 ── */
+.section {
+  background: var(--card-w); border-radius: var(--r-md);
+  padding: var(--sp-l); margin-bottom: var(--sp-m); box-sizing: border-box;
+  box-shadow: 0 1rpx 0 var(--border-2), 0 2rpx 8rpx rgba(43,40,35,.05);
+}
+.section-title { font-size: 28rpx; font-weight: 700; color: var(--text); margin-bottom: var(--sp-s); }
+.section-desc  { font-size: 24rpx; color: var(--text-2); line-height: 38rpx; margin-bottom: var(--sp-m); }
+
+.primary-btn {
+  height: 88rpx; line-height: 88rpx; text-align: center;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-md); font-size: 28rpx; font-weight: 600;
+  margin-bottom: var(--sp-s);
+}
+.secondary-btn {
+  height: 88rpx; line-height: 88rpx; text-align: center;
+  background: var(--primary-bg); color: var(--primary);
+  border-radius: var(--r-md); font-size: 28rpx; font-weight: 600;
+}
+.danger-btn {
+  height: 88rpx; line-height: 88rpx; text-align: center;
+  background: var(--danger-bg); color: var(--danger);
+  border-radius: var(--r-md); font-size: 28rpx; font-weight: 600;
+  margin-top: var(--sp-m);
+}
+.tip { font-size: 23rpx; color: var(--text-3); margin-top: var(--sp-m); text-align: center; }
+
+.import-box {
+  width: 100%; min-height: 200rpx; padding: var(--sp-m);
+  background: var(--bg); border-radius: var(--r-sm);
+  font-size: 26rpx; color: var(--text); box-sizing: border-box; line-height: 1.6;
+}
+
+/* ── 说明 ── */
+.note {
+  padding: var(--sp-m) var(--sp-l);
+  background: var(--bg2); border-radius: var(--r-md);
+  font-size: 22rpx; color: var(--text-3); line-height: 36rpx;
+}
+.note view { margin-bottom: var(--sp-s); }
+.note view:last-child { margin-bottom: 0; }

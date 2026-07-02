@@ -1,0 +1,15 @@
+# 依赖
+node_modules/
+**/node_modules/
+miniprogram_npm/
+
+# 系统
+.DS_Store
+*.log
+
+# 微信私有配置（本地覆盖设置，不入库）
+project.private.config.json
+
+# 编辑器/本地工具
+.idea/
+.vscode/

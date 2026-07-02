@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="draw-header">
+    <view class="eyebrow">今天吃什么</view>
+    <view class="title">抽一张今晚的菜</view>
+    <view class="subtitle">主料优先，缺调料也能抽</view>
+  </view>
+
+  <view class="stage">
+    <view class="card-stack">
+      <view class="back-card back-one"></view>
+      <view class="back-card back-two"></view>
+      <view class="draw-card {{isDrawing ? 'drawing' : ''}}" bindtap="startDraw">
+        <image wx:if="{{currentDish.coverImage}}" class="card-cover" src="{{currentDish.coverImage}}" mode="aspectFill"></image>
+        <view wx:else class="card-cover fallback-cover {{currentDish.thumbClass}}">
+          <text>{{currentDish.thumbText}}</text>
+        </view>
+        <view class="card-body">
+          <view class="result-label">{{resultLabel}}</view>
+          <view class="dish-name">{{currentDish.name}}</view>
+          <view class="dish-meta">{{currentDish.ingredientText}}</view>
+          <view class="match-row">
+            <text class="match-badge {{currentDish.matchClass}}">{{currentDish.matchText}}</text>
+            <text class="match-detail">{{currentDish.missingText}}</text>
+          </view>
+          <view class="tag-row">
+            <text wx:if="{{currentDish.mealRole}}" class="tag role-tag">{{currentDish.mealRole}}</text>
+            <text wx:for="{{currentDish.tagViews}}" wx:key="key" wx:for-item="tag" class="tag">{{tag.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="draw-btn" bindtap="startDraw">{{drawButtonText}}</view>
+    <view class="add-btn {{hasResult ? '' : 'btn-disabled'}}" bindtap="addToMenu">加入今日菜单</view>
+    <button wx:if="{{hasResult}}" class="share-btn" open-type="share">分享这张卡</button>
+  </view>
+
+  <view class="pool-info">
+    <text>候选 {{candidateCount}} 道</text>
+    <text>{{poolHint}}</text>
+  </view>
+</view>

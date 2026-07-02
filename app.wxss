@@ -1,0 +1,224 @@
+/* ==========================================================
+   设计 Token —— 参考「原野春天」风格
+   暖灰底 · 描线插画 · 橄榄绿主色 · 极细边框 · 大留白
+   ========================================================== */
+page {
+  /* ── 间距规范（四级，严格复用）──────────
+     --sp-s  8rpx   · 标签内边距、小图标
+     --sp-m  16rpx  · 行距、元素间距
+     --sp-l  24rpx  · 卡片内边距、页面水平边距
+     --sp-xl 36rpx  · 分组间距、大块留白
+  ──────────────────────────────────────── */
+  --sp-s:  8rpx;
+  --sp-m:  16rpx;
+  --sp-l:  24rpx;
+  --sp-xl: 36rpx;
+
+  /* ── 圆角规范（三级）── */
+  --r-sm:  10rpx;   /* 标签、输入框 */
+  --r-md:  20rpx;   /* 卡片 */
+  --r-lg:  26rpx;   /* 底栏、大面板 */
+
+  /* ── 暖灰背景（greige：暖调但不偏黄）── */
+  --bg:     #F3F1ED;   /* 暖纸白，红褐微调 */
+  --bg2:    #E9E5DF;   /* 暖灰，用于 chip / 内嵌 */
+  --card:   #FAF9F6;   /* 暖白卡片 */
+  --card-w: #FFFFFF;   /* 纯白卡片 */
+
+  /* ── 暖调分隔线（带褐色底，不是冷灰）── */
+  --border:   rgba(64,58,50,0.16);
+  --border-2: rgba(64,58,50,0.07);
+
+  /* ── 暖炭文字色阶 ── */
+  --text:   #26241F;              /* 暖近黑 */
+  --text-2: rgba(48,43,36,0.62);  /* 暖二级灰 */
+  --text-3: rgba(48,43,36,0.34);  /* 暖三级灰 */
+
+  /* ── 品牌主色（鼠尾草绿 · 去饱和）── */
+  --primary:    #4F6B52;
+  --primary-bg: #E5EBE1;
+  --primary-dk: #3B5340;
+  --primary-mid:#7B9079;
+
+  /* ── 陶土橙（莫兰迪暖色，替代鲜橙）── */
+  --amber:    #BE7A53;
+  --amber-bg: #F2E6DB;
+
+  /* ── 雾霾蓝（去饱和，点缀用）── */
+  --blue:    #6E879C;
+  --blue-bg: #E2E8ED;
+
+  /* ── 砖红（去饱和，替代鲜红）── */
+  --danger:    #B05548;
+  --danger-bg: #F1E1DD;
+
+  background: var(--bg);
+  color: var(--text);
+  /* SF Pro / PingFang SC — iOS 原生字体栈 */
+  font-family: -apple-system, "SF Pro Display", "SF Pro Text",
+               "PingFang SC", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================
+   组件 · Card  (iOS grouped-list 风格)
+   ========================================================== */
+.c-card {
+  background: var(--card-w);
+  border-radius: var(--r-md);
+  /* iOS 用极轻阴影取代边框，视觉更干净 */
+  box-shadow: 0 1rpx 0 var(--border-2),
+              0 2rpx 8rpx rgba(0,0,0,.06);
+}
+.c-card-w {
+  background: var(--card-w);
+  border-radius: var(--r-md);
+  box-shadow: 0 1rpx 0 var(--border-2),
+              0 4rpx 16rpx rgba(0,0,0,.07);
+}
+.c-card-inset {
+  /* 内嵌分组：白底 + 仅上下分隔线，无圆角（用于列表内部行） */
+  background: var(--card-w);
+  border-top: 1rpx solid var(--border-2);
+  border-bottom: 1rpx solid var(--border-2);
+}
+.c-card-tinted {
+  background: var(--primary-bg);
+  border-radius: var(--r-md);
+}
+
+/* ==========================================================
+   组件 · Button  (iOS Human Interface 规范)
+   ========================================================== */
+.c-btn {
+  display: flex; align-items: center; justify-content: center;
+  height: 80rpx; padding: 0 36rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx; font-weight: 600;
+  letter-spacing: 0.3rpx;
+  box-sizing: border-box; line-height: 1;
+}
+.c-btn::after { border: none; }
+/* Filled — 主操作 */
+.c-btn-primary { background: var(--primary); color: #fff; }
+/* Tinted — 次要操作，iOS 风格半透明前景 */
+.c-btn-tinted  { background: var(--primary-bg); color: var(--primary); }
+/* Plain — 最低强调 */
+.c-btn-plain   { background: transparent; color: var(--primary); }
+/* Destructive */
+.c-btn-danger  { background: var(--danger-bg); color: var(--danger); }
+/* Gray (neutral) */
+.c-btn-neutral { background: var(--bg2); color: var(--text-2); }
+/* Dark fill */
+.c-btn-dark    { background: #2B2823; color: #fff; }
+
+.c-btn-ghost { background: transparent; color: var(--primary); border: 1.5rpx solid var(--primary); }
+.c-btn-amber { background: var(--amber); color: #fff; }
+
+/* 尺寸修饰 */
+.c-btn-sm  { height: 60rpx; padding: 0 24rpx; font-size: 25rpx; border-radius: 30rpx; }
+.c-btn-xs  { height: 48rpx; padding: 0 18rpx; font-size: 23rpx; border-radius: 24rpx; }
+.c-btn-full { width: 100%; }
+.c-btn-rect { border-radius: var(--r-sm); }
+
+/* ==========================================================
+   组件 · Tag / Badge  (iOS pill 样式)
+   ========================================================== */
+.c-tag {
+  display: inline-flex; align-items: center;
+  height: 36rpx; padding: 0 14rpx;
+  border-radius: 18rpx;   /* 全圆角 pill */
+  font-size: 22rpx; font-weight: 500;
+  letter-spacing: 0.2rpx;
+}
+.c-tag-green   { background: var(--primary-bg); color: var(--primary); }
+.c-tag-amber   { background: var(--amber-bg);   color: var(--amber); }
+.c-tag-blue    { background: var(--blue-bg);    color: var(--blue); }
+.c-tag-neutral { background: var(--bg2);        color: var(--text-2); }
+.c-tag-outline { border: 1rpx solid currentColor; background: transparent; }
+.c-tag-dark    { background: #2B2823; color: #fff; }
+
+/* ==========================================================
+   组件 · Input  (iOS text field 样式)
+   ========================================================== */
+.c-input {
+  width: 100%; height: 84rpx; padding: 0 var(--sp-l);
+  background: var(--card-w);
+  border-radius: var(--r-sm);
+  font-size: 30rpx; color: var(--text);
+  box-sizing: border-box; display: block;
+  /* iOS: 无边框，用背景色与页面区分 */
+}
+.c-textarea {
+  width: 100%; min-height: 128rpx; padding: var(--sp-m) var(--sp-l);
+  background: var(--card-w); border-radius: var(--r-sm);
+  font-size: 28rpx; color: var(--text);
+  box-sizing: border-box; display: block; line-height: 1.65;
+}
+
+/* ==========================================================
+   组件 · Typography  (SF Pro 字阶)
+   Large Title 34pt · Title 28pt · Headline 17pt semibold
+   Body 17pt · Callout 16pt · Subhead 15pt · Footnote 13pt · Caption 12pt
+   rpx = pt × 2
+   ========================================================== */
+.c-large-title { font-size: 68rpx; font-weight: 700; color: var(--text); letter-spacing: -1rpx; }
+.c-title       { font-size: 56rpx; font-weight: 700; color: var(--text); letter-spacing: -0.5rpx; }
+.c-title-2     { font-size: 44rpx; font-weight: 700; color: var(--text); }
+.c-headline    { font-size: 34rpx; font-weight: 600; color: var(--text); }
+.c-body        { font-size: 34rpx; font-weight: 400; color: var(--text); }
+.c-callout     { font-size: 32rpx; font-weight: 400; color: var(--text); }
+.c-subhead     { font-size: 30rpx; font-weight: 400; color: var(--text); }
+.c-footnote    { font-size: 26rpx; font-weight: 400; color: var(--text-2); }
+.c-caption     { font-size: 24rpx; font-weight: 400; color: var(--text-3); }
+.c-caption-2   { font-size: 22rpx; font-weight: 400; color: var(--text-3); }
+/* iOS section header: 全大写 + 小字 + secondaryLabel */
+.c-section-header {
+  font-size: 24rpx; font-weight: 400; color: var(--text-2);
+  text-transform: uppercase; letter-spacing: 1rpx;
+  padding: var(--sp-s) 0 var(--sp-s);
+}
+.c-label { font-size: 28rpx; font-weight: 600; color: var(--text); display: block; margin-bottom: var(--sp-s); }
+
+/* ==========================================================
+   组件 · Divider / Separator
+   ========================================================== */
+/* iOS 标准分隔线从左 padding 开始 (inset) */
+.c-sep       { height: 1rpx; background: var(--border-2); margin-left: var(--sp-l); }
+.c-sep-full  { height: 1rpx; background: var(--border-2); }
+
+/* ==========================================================
+   组件 · Chip (filter / segment)
+   ========================================================== */
+.c-chip {
+  height: 56rpx; line-height: 54rpx; padding: 0 var(--sp-l);
+  border-radius: 28rpx;
+  background: var(--card-w);
+  color: var(--text-2);
+  font-size: 26rpx; font-weight: 500;
+  box-sizing: border-box;
+  box-shadow: 0 1rpx 4rpx rgba(0,0,0,.08);
+}
+.c-chip-active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* ==========================================================
+   组件 · List row
+   ========================================================== */
+.c-row {
+  display: flex; align-items: center; gap: var(--sp-m);
+  padding: var(--sp-m) 0; min-height: 88rpx;
+  border-bottom: 1rpx solid var(--border-2);
+}
+.c-row:last-child { border-bottom: none; }
+
+/* ==========================================================
+   组件 · Match badge colors
+   ========================================================== */
+.match-ready   { background: var(--primary); }  /* 可做 · 绿 */
+.match-almost  { background: var(--amber); }    /* 缺调料 · 暖琥珀 */
+.match-missing { background: var(--amber); }    /* 缺主料 · 暖琥珀 */

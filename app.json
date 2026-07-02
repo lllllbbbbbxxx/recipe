@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/menu/menu",
+    "pages/add/add",
+    "pages/fridge/fridge",
+    "pages/draw/draw",
+    "pages/backup/backup",
+    "pages/share/share",
+    "pages/orders/orders"
+  ],
+  "window": {
+    "navigationBarTitleText": "今天吃什么",
+    "navigationBarBackgroundColor": "#F3F1ED",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F3F1ED"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64">
+  <!-- 筷子 -->
+  <line x1="16" y1="8" x2="24" y2="58" stroke="#4F6B52" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="22" y1="8" x2="30" y2="58" stroke="#4F6B52" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- 碗 -->
+  <path d="M44,54 Q56,32 68,54" stroke="#BE7A53" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <line x1="42" y1="54" x2="70" y2="54" stroke="#BE7A53" stroke-width="1.6" stroke-linecap="round"/>
+  <ellipse cx="56" cy="36" rx="12" ry="4" stroke="#BE7A53" stroke-width="1.2" fill="none"/>
+  <!-- 热气 -->
+  <path d="M50,32 Q48,25 50,19" stroke="#6E879C" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M56,30 Q54,23 56,17" stroke="#6E879C" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M62,32 Q60,25 62,19" stroke="#6E879C" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- 番茄 -->
+  <circle cx="94" cy="44" r="13" stroke="#BE7A53" stroke-width="1.6" fill="none"/>
+  <path d="M90,33 Q94,26 98,33" stroke="#4F6B52" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <line x1="94" y1="27" x2="94" y2="33" stroke="#4F6B52" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- 胡萝卜 -->
+  <path d="M122,18 L130,58" stroke="#BE7A53" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M121,19 Q116,12 119,9 Q122,7 122,14" stroke="#4F6B52" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M127,23 Q132,16 134,19" stroke="#4F6B52" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- 叶菜 -->
+  <path d="M150,58 Q162,26 174,58" stroke="#4F6B52" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <line x1="162" y1="36" x2="162" y2="58" stroke="#4F6B52" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="158" y1="44" x2="162" y2="38" stroke="#4F6B52" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="166" y1="44" x2="162" y2="38" stroke="#4F6B52" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- 鱼 -->
+  <path d="M190,40 Q210,22 232,40 Q210,58 190,40Z" stroke="#6E879C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M188,38 Q180,28 182,44Z" stroke="#6E879C" stroke-width="1.4" fill="none"/>
+  <circle cx="228" cy="37" r="2" fill="#6E879C"/>
+  <!-- 蒜头 -->
+  <path d="M255,55 Q258,42 261,55" stroke="#BE7A53" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M260,55 Q263,42 266,55" stroke="#BE7A53" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M265,55 Q268,42 271,55" stroke="#BE7A53" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <line x1="253" y1="55" x2="273" y2="55" stroke="#BE7A53" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M263,40 L263,24 Q266,18 262,14 Q258,18 261,24" stroke="#4F6B52" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- 装饰圆点 -->
+  <circle cx="140" cy="12" r="2.5" fill="#C9C3B8"/>
+  <circle cx="200" cy="10" r="2" fill="#C9C3B8"/>
+  <circle cx="244" cy="14" r="2.5" fill="#C9C3B8"/>
+  <circle cx="305" cy="22" r="2" fill="#C9C3B8"/>
+  <circle cx="330" cy="42" r="2.5" fill="#C9C3B8"/>
+</svg>

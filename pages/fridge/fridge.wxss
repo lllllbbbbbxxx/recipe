@@ -1,0 +1,236 @@
+.page { min-height: 100vh; background: var(--bg); padding: var(--sp-m) var(--sp-l) 60rpx; box-sizing: border-box; }
+
+/* ── 通用分组卡片 ── */
+.form-section, .summary-section, .list-section {
+  background: var(--card-w);
+  border-radius: var(--r-md);
+  padding: var(--sp-l);
+  margin-bottom: var(--sp-m);
+  box-sizing: border-box;
+  box-shadow: 0 1rpx 0 var(--border-2), 0 2rpx 8rpx rgba(43,40,35,.05);
+}
+
+.section-title { font-size: 28rpx; font-weight: 700; color: var(--text); margin-bottom: var(--sp-m); }
+
+/* ── 添加表单 ── */
+.input {
+  width: 100%; height: 80rpx; padding: 0 var(--sp-m);
+  background: var(--bg); border-radius: var(--r-sm);
+  font-size: 30rpx; color: var(--text); box-sizing: border-box;
+  margin-bottom: var(--sp-s);
+}
+.amount-input { margin-bottom: var(--sp-m); }
+
+.category-row { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-bottom: var(--sp-m); }
+.category-chip {
+  height: 60rpx; line-height: 60rpx; padding: 0 var(--sp-l);
+  border-radius: 30rpx; background: var(--bg);
+  color: var(--text-2); font-size: 26rpx; box-sizing: border-box;
+}
+.category-active { background: var(--primary); color: #fff; font-weight: 600; }
+
+.scan-row { margin-bottom: var(--sp-m); }
+.scan-btn {
+  height: 80rpx; line-height: 80rpx; text-align: center;
+  background: var(--primary-bg); color: var(--primary);
+  border-radius: var(--r-sm); font-size: 27rpx; font-weight: 600;
+}
+
+.save-btn {
+  height: 88rpx; line-height: 88rpx; text-align: center;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-md); font-size: 30rpx; font-weight: 600;
+}
+
+/* ── 临期提醒 ── */
+.summary-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-s); }
+.summary-head .section-title { margin-bottom: 0; }
+.summary-pill {
+  height: 40rpx; line-height: 40rpx; padding: 0 var(--sp-m);
+  background: var(--amber-bg); color: var(--amber);
+  border-radius: 20rpx; font-size: 22rpx; font-weight: 600;
+}
+.summary-desc { font-size: 25rpx; color: var(--text-2); line-height: 38rpx; margin-bottom: var(--sp-m); }
+.urgent-list { display: flex; flex-direction: column; gap: var(--sp-s); }
+.urgent-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-m); background: var(--bg); border-radius: var(--r-sm);
+}
+.urgent-name { font-size: 27rpx; font-weight: 600; color: var(--text); }
+.urgent-meta { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
+.urgent-tag {
+  height: 40rpx; line-height: 40rpx; padding: 0 var(--sp-m);
+  border-radius: 20rpx; font-size: 22rpx; font-weight: 600; flex-shrink: 0;
+  background: var(--bg2); color: var(--text-2);
+}
+.urgent-tag.urgent-expired { background: var(--danger-bg); color: var(--danger); }
+.urgent-tag.urgent-soon    { background: var(--amber-bg);  color: var(--amber); }
+
+/* ── 已有食材列表 ── */
+.empty { text-align: center; color: var(--text-3); font-size: 26rpx; padding: var(--sp-xl) 0; }
+
+/* 空冰箱快捷入口 */
+.empty-fridge {
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--sp-l) 0 var(--sp-s);
+}
+.empty-fridge-icon { font-size: 64rpx; margin-bottom: var(--sp-s); }
+.empty-fridge-text { font-size: 26rpx; color: var(--text-3); margin-bottom: var(--sp-m); }
+.empty-fridge-quick {
+  height: 76rpx; line-height: 76rpx; padding: 0 var(--sp-xl);
+  background: var(--primary); color: #fff;
+  border-radius: 38rpx; font-size: 27rpx; font-weight: 600;
+}
+
+.item-group { margin-top: var(--sp-s); }
+.item-group:first-of-type { margin-top: 0; }
+.item-group-title {
+  display: flex; align-items: center; gap: var(--sp-s);
+  font-size: 24rpx; color: var(--text-2); font-weight: 600;
+  padding: var(--sp-m) 0 var(--sp-s);
+}
+.group-chevron {
+  font-size: 22rpx; color: var(--text-3);
+  transition: transform .2s ease;
+  display: inline-block;
+}
+.group-chevron.open { transform: rotate(90deg); }
+.group-name { flex: 1; }
+.item-count {
+  color: var(--text-3); font-size: 22rpx; font-weight: 400;
+  background: var(--bg); border-radius: 999rpx;
+  min-width: 32rpx; height: 32rpx; line-height: 32rpx; text-align: center;
+  padding: 0 10rpx;
+}
+
+/* 左滑容器 */
+.item-swipe {
+  position: relative; overflow: hidden;
+}
+/* 隐藏在右侧、左滑后露出的删除 */
+.item-del-action {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 128rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--danger); color: #fff; font-size: 25rpx; font-weight: 500;
+}
+.item-row {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-m);
+  padding: var(--sp-m) 0;
+  background: var(--card-w);          /* 盖住下层删除按钮 */
+  border-bottom: 1rpx solid var(--border-2);  /* 分隔线放在行上，随行覆盖删除 */
+  box-sizing: border-box;
+  transition: transform .2s ease;
+}
+.item-swipe:last-child .item-row { border-bottom: none; }
+.item-row.swiped { transform: translateX(-128rpx); }
+.item-main { flex: 1; min-width: 0; }
+.item-name { font-size: 28rpx; color: var(--text); font-weight: 500; }
+.item-meta { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
+.item-meta.soon-text    { color: var(--amber); }
+.item-meta.expired-text { color: var(--danger); }
+/* 右侧数量/重量 */
+.item-qty { font-size: 24rpx; color: var(--text-2); font-weight: 500; flex-shrink: 0; }
+/* 非常备：可编辑数量输入框 */
+.item-qty-input {
+  width: 150rpx; height: 56rpx; line-height: 56rpx;
+  padding: 0 var(--sp-m);
+  margin-right: var(--sp-s);          /* 离右边缘留点空隙 */
+  text-align: right; font-size: 24rpx; color: var(--text);
+  background: var(--bg); border-radius: var(--r-sm);
+  box-sizing: border-box; flex-shrink: 0;
+}
+.qty-ph { color: var(--text-3); font-size: 24rpx; }
+
+/* ── OCR 模态框 ── */
+.ocr-mask {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.46); display: flex; align-items: flex-end;
+}
+.ocr-panel {
+  width: 100%; background: var(--card-w);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: var(--sp-l) var(--sp-l) 56rpx; box-sizing: border-box;
+  max-height: 78vh; display: flex; flex-direction: column;
+}
+.ocr-panel::before {
+  content: ''; display: block; width: 72rpx; height: 6rpx; border-radius: 3rpx;
+  background: rgba(64,58,50,.2); margin: 0 auto var(--sp-l);
+}
+.ocr-title { font-size: 30rpx; font-weight: 700; color: var(--text); margin-bottom: 4rpx; }
+.ocr-desc  { font-size: 23rpx; color: var(--text-3); margin-bottom: var(--sp-m); }
+.ocr-item {
+  display: flex; align-items: center; gap: var(--sp-m);
+  padding: var(--sp-m) 0; border-bottom: 1rpx solid var(--border-2);
+}
+.ocr-item:last-of-type { border-bottom: none; }
+.ocr-check {
+  width: 44rpx; height: 44rpx; border-radius: 50%;
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  color: transparent; font-size: 22rpx; flex-shrink: 0; box-sizing: border-box;
+}
+.ocr-check.on { background: var(--primary); color: #fff; }
+.ocr-item-name { flex: 1; font-size: 28rpx; color: var(--text); }
+.ocr-item-amount {
+  font-size: 23rpx; color: var(--text-2); font-weight: 500;
+  background: var(--bg); border-radius: 999rpx;
+  padding: 4rpx var(--sp-m); flex-shrink: 0;
+}
+.ocr-empty { text-align: center; color: var(--text-3); font-size: 26rpx; padding: var(--sp-xl) 0; }
+.ocr-actions { display: flex; gap: var(--sp-m); margin-top: var(--sp-m); flex-shrink: 0; }
+.ocr-cancel {
+  flex: 1; height: 80rpx; line-height: 80rpx; text-align: center;
+  background: var(--bg); border-radius: var(--r-md);
+  color: var(--text-2); font-size: 27rpx; box-sizing: border-box;
+}
+.ocr-confirm {
+  flex: 2; height: 80rpx; line-height: 80rpx; text-align: center;
+  background: var(--primary); color: #fff; border-radius: var(--r-md);
+  font-size: 27rpx; font-weight: 600; box-sizing: border-box;
+}
+
+/* ── 库存引导弹窗 ── */
+.guide-mask {
+  position: fixed; inset: 0; z-index: 280;
+  background: rgba(0,0,0,.46); display: flex; align-items: flex-end;
+}
+.guide-panel {
+  width: 100%; background: var(--card-w);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: var(--sp-l) var(--sp-l) 56rpx; box-sizing: border-box;
+  max-height: 82vh; overflow-y: auto;
+}
+.guide-panel::before {
+  content: ''; display: block; width: 72rpx; height: 6rpx; border-radius: 3rpx;
+  background: rgba(64,58,50,.2); margin: 0 auto var(--sp-l);
+}
+.guide-title { font-size: 32rpx; font-weight: 700; color: var(--text); }
+.guide-subtitle { font-size: 24rpx; color: var(--text-3); margin: var(--sp-s) 0 var(--sp-l); }
+
+.guide-group { margin-bottom: var(--sp-l); }
+.guide-group-head { display: flex; align-items: baseline; gap: var(--sp-s); margin-bottom: var(--sp-s); }
+.guide-group-title { font-size: 26rpx; font-weight: 600; color: var(--text); }
+.guide-group-desc { font-size: 22rpx; color: var(--text-3); }
+.guide-items { display: flex; flex-wrap: wrap; gap: var(--sp-s); }
+.guide-chip {
+  display: flex; align-items: center; gap: 6rpx;
+  height: 60rpx; padding: 0 var(--sp-m);
+  border-radius: 30rpx; background: var(--bg);
+  color: var(--text-2); font-size: 25rpx; box-sizing: border-box;
+}
+.guide-chip-active { background: var(--primary-bg); color: var(--primary); font-weight: 600; }
+.check-dot { font-size: 22rpx; }
+
+.guide-actions { display: flex; gap: var(--sp-m); margin-top: var(--sp-s); }
+.skip-btn {
+  flex: 1; height: 84rpx; line-height: 84rpx; text-align: center;
+  background: var(--bg); border-radius: var(--r-md);
+  color: var(--text-2); font-size: 27rpx;
+}
+.guide-primary {
+  flex: 2; height: 84rpx; line-height: 84rpx; text-align: center;
+  background: var(--primary); color: #fff;
+  border-radius: var(--r-md); font-size: 27rpx; font-weight: 600;
+}

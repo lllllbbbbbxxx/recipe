@@ -1,0 +1,53 @@
+<view class="page">
+
+  <view wx:if="{{loading}}" class="loading">加载中…</view>
+
+  <view wx:elif="{{submitted}}" class="success-page">
+    <view class="success-icon">✓</view>
+    <view class="success-title">选单已发出！</view>
+    <view class="success-desc">厨师看到后会安排的，坐等开饭吧～</view>
+  </view>
+
+  <view wx:elif="{{empty}}" class="loading">找不到菜单，链接可能已过期</view>
+
+  <view wx:else>
+    <view class="header-card">
+      <view class="header-title">选你想吃的菜</view>
+      <view class="header-desc">点选菜名，选完填下方信息再提交</view>
+    </view>
+
+    <view class="dish-list">
+      <view
+        wx:for="{{dishes}}"
+        wx:key="id"
+        class="dish-item {{selectedIds.includes(item.id) ? 'selected' : ''}}"
+        bindtap="toggleDish"
+        data-id="{{item.id}}"
+      >
+        <view class="dish-check {{selectedIds.includes(item.id) ? 'on' : ''}}">
+          {{selectedIds.includes(item.id) ? '✓' : ''}}
+        </view>
+        <view class="dish-info">
+          <view class="dish-name">{{item.name}}</view>
+          <view class="dish-sub">{{item.mealRole}}{{item.ingredientText ? '  ·  ' + item.ingredientText : ''}}</view>
+          <view wx:if="{{item.tags.length}}" class="dish-tags">
+            <text wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag" class="dish-tag">{{tag}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-card">
+      <view class="form-title">你的信息</view>
+      <input class="form-input" placeholder="你叫什么（必填）" value="{{guestName}}" bindinput="onNameInput" />
+      <textarea class="form-textarea" placeholder="备注，比如不要辣、人数…（可选）" value="{{note}}" bindinput="onNoteInput" />
+      <view class="selected-summary" wx:if="{{selectedIds.length}}">
+        已选 {{selectedIds.length}} 道菜
+      </view>
+      <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="submitOrder">
+        {{submitting ? '提交中…' : '提交选单'}}
+      </view>
+    </view>
+  </view>
+
+</view>

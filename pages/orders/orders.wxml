@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="hero">
+    <view class="title">收到的订单</view>
+    <view class="subtitle">好友通过分享链接选的菜</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+
+  <view wx:elif="{{empty}}" class="empty-state">
+    <view class="empty-icon">📋</view>
+    <view class="empty-title">还没有人下单</view>
+    <view class="empty-desc">去菜单页把菜单分享给好友，他们选好菜后会出现在这里</view>
+  </view>
+
+  <view wx:else>
+    <view
+      wx:for="{{orders}}"
+      wx:key="id"
+      class="order-card {{item.status === 'done' ? 'done' : ''}}"
+    >
+      <view class="order-head">
+        <view class="guest-name">{{item.guestName}}</view>
+        <view class="order-time">{{item.timeText}}</view>
+      </view>
+      <view class="order-dishes">{{item.dishNames}}</view>
+      <view wx:if="{{item.note}}" class="order-note">备注：{{item.note}}</view>
+      <view class="order-footer">
+        <view class="status-badge {{item.status === 'done' ? 'badge-done' : 'badge-pending'}}">
+          {{item.status === 'done' ? '已完成' : '待处理'}}
+        </view>
+        <view wx:if="{{item.status !== 'done'}}" class="done-btn" bindtap="markDone" data-id="{{item.id}}">
+          标记完成
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
