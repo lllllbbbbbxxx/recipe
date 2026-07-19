@@ -60,7 +60,18 @@
       <text class="add-row" bindtap="addIngredient">+ 添加</text>
     </view>
 
-    <view wx:for="{{ingredients}}" wx:key="index" class="ingredient-row">
+    <!-- 常用调料快捷添加 -->
+    <view class="seasoning-quick">
+      <view
+        wx:for="{{commonSeasonings}}"
+        wx:key="*this"
+        class="seasoning-chip"
+        bindtap="quickAddSeasoning"
+        data-name="{{item}}"
+      >+ {{item}}</view>
+    </view>
+
+    <view wx:for="{{ingredients}}" wx:key="rowKey" class="ingredient-row">
       <input
         class="ingredient-name"
         placeholder="食材"

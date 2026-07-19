@@ -1,37 +1,73 @@
 <view class="page">
   <view class="hero">
-    <view class="title">收到的订单</view>
-    <view class="subtitle">好友通过分享链接选的菜</view>
+    <view class="title">点单</view>
+    <view class="subtitle">收到的 & 我点的</view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{activeTab === 'received' ? 'on' : ''}}" bindtap="switchTab" data-tab="received">
+      收到的<text wx:if="{{receivedOrders.length}}" class="tab-count">{{receivedOrders.length}}</text>
+    </view>
+    <view class="tab {{activeTab === 'placed' ? 'on' : ''}}" bindtap="switchTab" data-tab="placed">
+      我点的<text wx:if="{{placedOrders.length}}" class="tab-count">{{placedOrders.length}}</text>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="tip">加载中…</view>
 
-  <view wx:elif="{{empty}}" class="empty-state">
-    <view class="empty-icon">📋</view>
-    <view class="empty-title">还没有人下单</view>
-    <view class="empty-desc">去菜单页把菜单分享给好友，他们选好菜后会出现在这里</view>
-  </view>
-
-  <view wx:else>
-    <view
-      wx:for="{{orders}}"
-      wx:key="id"
-      class="order-card {{item.status === 'done' ? 'done' : ''}}"
-    >
-      <view class="order-head">
-        <view class="guest-name">{{item.guestName}}</view>
-        <view class="order-time">{{item.timeText}}</view>
-      </view>
-      <view class="order-dishes">{{item.dishNames}}</view>
-      <view wx:if="{{item.note}}" class="order-note">备注：{{item.note}}</view>
-      <view class="order-footer">
-        <view class="status-badge {{item.status === 'done' ? 'badge-done' : 'badge-pending'}}">
-          {{item.status === 'done' ? '已完成' : '待处理'}}
+  <!-- ── 收到的（我当厨师，别人点我的）── -->
+  <block wx:elif="{{activeTab === 'received'}}">
+    <view wx:if="{{!receivedOrders.length}}" class="empty-state">
+      <view class="empty-icon">📋</view>
+      <view class="empty-title">还没有人下单</view>
+      <view class="empty-desc">去菜单页把菜单分享给好友，他们选好菜后会出现在这里</view>
+    </view>
+    <view wx:else>
+      <view wx:for="{{receivedOrders}}" wx:key="id" class="order-card {{item.status === 'done' ? 'done' : ''}}">
+        <view class="order-head">
+          <image wx:if="{{item.guestAvatar}}" class="guest-avatar" src="{{item.guestAvatar}}" mode="aspectFill"></image>
+          <view wx:else class="guest-avatar guest-avatar-default">{{item.guestInitial}}</view>
+          <view class="guest-meta">
+            <view class="guest-name">{{item.guestName}}</view>
+            <view class="order-time">{{item.timeText}}</view>
+          </view>
         </view>
-        <view wx:if="{{item.status !== 'done'}}" class="done-btn" bindtap="markDone" data-id="{{item.id}}">
-          标记完成
+        <view class="order-dishes">{{item.dishNames}}</view>
+        <view wx:if="{{item.note}}" class="order-note">备注：{{item.note}}</view>
+        <view class="order-footer">
+          <view class="status-badge {{item.status === 'done' ? 'badge-done' : 'badge-pending'}}">
+            {{item.status === 'done' ? '已完成' : '待处理'}}
+          </view>
+          <view class="foot-actions">
+            <view class="add-menu-btn" bindtap="addToMenu" data-id="{{item.id}}">加入今日菜单</view>
+            <view wx:if="{{item.status !== 'done'}}" class="done-btn" bindtap="markDone" data-id="{{item.id}}">标记完成</view>
+          </view>
         </view>
       </view>
     </view>
-  </view>
+  </block>
+
+  <!-- ── 我点的（我当食客，点别人的）── -->
+  <block wx:elif="{{activeTab === 'placed'}}">
+    <view wx:if="{{!placedOrders.length}}" class="empty-state">
+      <view class="empty-icon">🍽️</view>
+      <view class="empty-title">还没点过别人的菜单</view>
+      <view class="empty-desc">打开朋友分享的菜单链接，选菜下单后会出现在这里</view>
+    </view>
+    <view wx:else>
+      <view wx:for="{{placedOrders}}" wx:key="id" class="order-card {{item.status === 'done' ? 'done' : ''}}">
+        <view class="order-dishes">{{item.dishNames}}</view>
+        <view wx:if="{{item.note}}" class="order-note">备注：{{item.note}}</view>
+        <view class="order-footer">
+          <view class="status-badge {{item.status === 'done' ? 'badge-done' : 'badge-pending'}}">
+            {{item.status === 'done' ? '已完成' : '待处理'}}
+          </view>
+          <view class="foot-actions">
+            <view class="order-time">{{item.timeText}}</view>
+            <view class="mine-del" bindtap="deletePlaced" data-id="{{item.id}}">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
 </view>

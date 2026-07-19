@@ -72,23 +72,30 @@
 .role-tag { background: var(--primary-bg); color: var(--primary); }
 
 /* ── 操作按钮 ── */
-.actions { display: flex; flex-direction: column; gap: var(--sp-s); margin-bottom: var(--sp-l); }
+.actions {
+  display: flex; flex-direction: column;
+  gap: var(--sp-m);                 /* 按钮间距加大到 16 */
+  margin: var(--sp-s) 0 var(--sp-l);
+}
+/* 三个按钮统一：flex 居中（微信 button 的默认行高不可靠），满宽、无默认边距 */
+.draw-btn, .actions .add-btn, .share-btn {
+  display: flex !important;
+  align-items: center; justify-content: center;
+  width: 100% !important; max-width: none !important;
+  margin: 0 !important; padding: 0;
+  height: 92rpx; line-height: 1;
+  border-radius: var(--r-md);
+  font-size: 29rpx; font-weight: 600;
+  box-sizing: border-box;
+}
 .draw-btn {
-  height: 92rpx; line-height: 92rpx; text-align: center;
-  background: var(--primary); color: #fff;
-  border-radius: var(--r-md); font-size: 30rpx; font-weight: 600;
+  background: var(--primary); color: #fff; font-size: 30rpx;
   box-shadow: 0 6rpx 20rpx rgba(79,107,82,.3);
 }
-.actions .add-btn {
-  height: 92rpx; line-height: 92rpx; text-align: center;
-  background: var(--primary-bg); color: var(--primary);
-  border-radius: var(--r-md); font-size: 29rpx; font-weight: 600;
-}
+.actions .add-btn { background: var(--primary-bg); color: var(--primary); }
 .actions .add-btn.btn-disabled { background: var(--bg2); color: var(--text-3); }
 .share-btn {
-  height: 92rpx; line-height: 92rpx; text-align: center;
-  background: var(--card-w); color: var(--text-2);
-  border-radius: var(--r-md); font-size: 27rpx; font-weight: 500;
+  background: var(--card-w); color: var(--text-2); font-size: 27rpx; font-weight: 500;
   box-shadow: 0 1rpx 3rpx rgba(43,40,35,.08);
 }
 .share-btn::after { border: none; }
@@ -96,5 +103,6 @@
 /* ── 候选信息 ── */
 .pool-info {
   display: flex; align-items: center; justify-content: space-between;
+  margin-top: var(--sp-s);
   padding: 0 var(--sp-s); font-size: 23rpx; color: var(--text-3);
 }

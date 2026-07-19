@@ -19,7 +19,10 @@
   font-size: 30rpx; color: var(--text); box-sizing: border-box;
   margin-bottom: var(--sp-s);
 }
-.amount-input { margin-bottom: var(--sp-m); }
+/* 添加表单：数字 + 单位 两框 */
+.amount-row { display: flex; gap: var(--sp-s); margin-bottom: var(--sp-m); }
+.amount-num { flex: 1; margin-bottom: 0; }
+.amount-unit { flex: 1; margin-bottom: 0; }
 
 .category-row { display: flex; flex-wrap: wrap; gap: var(--sp-s); margin-bottom: var(--sp-m); }
 .category-chip {
@@ -107,42 +110,48 @@
 .item-swipe {
   position: relative; overflow: hidden;
 }
-/* 隐藏在右侧、左滑后露出的删除 */
-.item-del-action {
+/* 左滑露出的两个按钮：设为常备 + 删除 */
+.item-actions {
   position: absolute; top: 0; right: 0; bottom: 0;
+  display: flex; width: 256rpx;
+}
+.item-act-staple, .item-act-del {
   width: 128rpx;
   display: flex; align-items: center; justify-content: center;
-  background: var(--danger); color: #fff; font-size: 25rpx; font-weight: 500;
+  color: #fff; font-size: 24rpx; font-weight: 500;
 }
+.item-act-staple { background: var(--amber); }
+.item-act-del { background: var(--danger); }
 .item-row {
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--sp-m);
   padding: var(--sp-m) 0;
-  background: var(--card-w);          /* 盖住下层删除按钮 */
-  border-bottom: 1rpx solid var(--border-2);  /* 分隔线放在行上，随行覆盖删除 */
+  background: var(--card-w);
+  border-bottom: 1rpx solid var(--border-2);
   box-sizing: border-box;
   transition: transform .2s ease;
 }
 .item-swipe:last-child .item-row { border-bottom: none; }
-.item-row.swiped { transform: translateX(-128rpx); }
+.item-row.swiped { transform: translateX(-256rpx); }
 .item-main { flex: 1; min-width: 0; }
 .item-name { font-size: 28rpx; color: var(--text); font-weight: 500; }
 .item-meta { font-size: 22rpx; color: var(--text-3); margin-top: 4rpx; }
 .item-meta.soon-text    { color: var(--amber); }
 .item-meta.expired-text { color: var(--danger); }
-/* 右侧数量/重量 */
-.item-qty { font-size: 24rpx; color: var(--text-2); font-weight: 500; flex-shrink: 0; }
-/* 非常备：可编辑数量输入框 */
-.item-qty-input {
-  width: 150rpx; height: 56rpx; line-height: 56rpx;
-  padding: 0 var(--sp-m);
-  margin-right: var(--sp-s);          /* 离右边缘留点空隙 */
+/* 非常备：数字 + 单位 两框 */
+.item-qty-box { display: flex; gap: 6rpx; flex-shrink: 0; margin-right: var(--sp-s); }
+.item-qty-num {
+  width: 88rpx; height: 56rpx; line-height: 56rpx; padding: 0 12rpx;
   text-align: right; font-size: 24rpx; color: var(--text);
-  background: var(--bg); border-radius: var(--r-sm);
-  box-sizing: border-box; flex-shrink: 0;
+  background: var(--bg); border-radius: var(--r-sm); box-sizing: border-box;
 }
-.qty-ph { color: var(--text-3); font-size: 24rpx; }
+.item-qty-unit {
+  width: 88rpx; height: 56rpx; line-height: 56rpx; padding: 0 12rpx;
+  font-size: 24rpx; color: var(--text);
+  background: var(--bg); border-radius: var(--r-sm); box-sizing: border-box;
+}
+.qty-ph { color: var(--text-3); font-size: 22rpx; }
 
 /* ── OCR 模态框 ── */
 .ocr-mask {

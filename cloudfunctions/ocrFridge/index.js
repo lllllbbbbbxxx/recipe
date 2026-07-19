@@ -79,5 +79,9 @@ exports.main = async (event) => {
 
   const result = await callTencentOCR(tempUrl)
   const textDetections = (result.Response && result.Response.TextDetections) || []
+
+  // 识别完即删临时图，避免 ocr-tmp/ 在云存储里无限累积
+  try { await cloud.deleteFile({ fileList: [fileID] }) } catch (e) {}
+
   return { textDetections }
 }

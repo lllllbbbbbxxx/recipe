@@ -104,22 +104,57 @@ function getDishMatch(dish, fridgeItems) {
   }
 }
 
-function buildDrawPool(dishes, fridgeItems) {
+// 临期/过期食材名（用于消耗加权）
+function getExpiringNames(fridgeItems) {
+  return (fridgeItems || [])
+    .filter(item => item.freshnessStatus === 'soon' || item.freshnessStatus === 'expired')
+    .map(item => item.name)
+}
+
+// 这道菜用到几样临期食材
+function countExpiringUsed(dish, expiringNames) {
+  let n = 0
+  ;(dish.ingredients || []).forEach(ing => {
+    const name = String(ing.name || '').trim()
+    if (name && expiringNames.some(e => name.includes(e) || e.includes(name))) n += 1
+  })
+  return n
+}
+
+/**
+ * 抽卡池加权：
+ *  基础：食材齐全 5，缺可选料 2
+ *  + 临期优先：用到临期食材 +3/样（封顶 +6）
+ *  + 荤素搭配：opts.cartRoles=今日菜单已有的类别，本菜类别不在其中 +3
+ */
+function buildDrawPool(dishes, fridgeItems, opts) {
+  opts = opts || {}
+  const cartRoles = opts.cartRoles || []
+  const expiringNames = getExpiringNames(fridgeItems)
   const pool = []
-  const source = dishes || []
-  source.forEach(dish => {
+  ;(dishes || []).forEach(dish => {
     const match = getDishMatch(dish, fridgeItems)
     if (!match.canDraw) return
-    const weight = match.missingOptional.length ? 2 : 5
-    for (let i = 0; i < weight; i += 1) {
-      pool.push({ dish, match })
+    let weight = match.missingOptional.length ? 2 : 5
+
+    const exp = countExpiringUsed(dish, expiringNames)
+    if (exp) weight += Math.min(exp * 3, 6)
+
+    const role = dish.mealRole || ''
+    if (role && cartRoles.length && cartRoles.indexOf(role) < 0) weight += 3
+
+    // 不重复推荐：48 小时内做过的菜权重减半（至少保留 1）
+    if (dish.lastCooked && Date.now() - dish.lastCooked < 48 * 3600 * 1000) {
+      weight = Math.max(1, Math.round(weight / 2))
     }
+
+    for (let i = 0; i < weight; i += 1) pool.push({ dish, match })
   })
   return pool
 }
 
-function pickWeightedDish(dishes, fridgeItems) {
-  const pool = buildDrawPool(dishes, fridgeItems)
+function pickWeightedDish(dishes, fridgeItems, opts) {
+  const pool = buildDrawPool(dishes, fridgeItems, opts)
   if (!pool.length) return null
   return pool[Math.floor(Math.random() * pool.length)]
 }

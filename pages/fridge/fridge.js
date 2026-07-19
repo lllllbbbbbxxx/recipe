@@ -1,6 +1,8 @@
 const fridgeStore = require('../../utils/fridge-store')
 const ingredientClassifier = require('../../utils/ingredient-classifier')
 const freshnessUtils = require('../../utils/freshness-utils')
+const track = require('../../utils/track')
+const amountUtils = require('../../utils/amount-utils')
 
 const CATEGORIES = ['蔬菜', '肉蛋', '调料', '主食', '其他']
 const GUIDE_STORAGE_KEY = 'fridge_basic_guide_done'
@@ -132,7 +134,8 @@ function buildGuideGroups(groups) {
 Page({
   data: {
     name: '',
-    amount: '',
+    qty: '',
+    unit: '',
     category: '其他',
     categoryOptions: CATEGORIES.map(name => ({ name, active: name === '其他' })),
     items: [],
@@ -157,6 +160,7 @@ Page({
   },
 
   onShow() {
+    track.track('page_view', { page: 'fridge' })
     this.loadItems(false)
   },
 
@@ -240,13 +244,34 @@ Page({
     if (this.data.openedItemId) this.setData({ openedItemId: '' })
   },
 
-  async onItemQtyInput(e) {
+  // 行内改数字
+  onItemQtyNum(e) {
     const id = String(e.currentTarget.dataset.id)
-    const amount = (e.detail.value || '').trim()
+    const qty = (e.detail.value || '').trim()
     const item = this.data.items.find(it => String(it.id) === id)
-    if (!item || (item.amount || '') === amount) return
-    await fridgeStore.saveItem({ ...item, amount })
-    this.loadItems(false)
+    if (!item || (item.qty || '') === qty) return
+    const items = fridgeStore.updateAmount(id, qty, item.unit || '')
+    track.track('fridge_qty_edit')
+    this.setItems(items)
+  },
+
+  // 行内改单位
+  onItemUnit(e) {
+    const id = String(e.currentTarget.dataset.id)
+    const unit = (e.detail.value || '').trim()
+    const item = this.data.items.find(it => String(it.id) === id)
+    if (!item || (item.unit || '') === unit) return
+    const items = fridgeStore.updateAmount(id, item.qty || '', unit)
+    this.setItems(items)
+  },
+
+  // 左滑切换是否常备
+  toggleStaple(e) {
+    const id = String(e.currentTarget.dataset.id)
+    const staple = e.currentTarget.dataset.staple
+    const items = fridgeStore.setStaple(id, !staple)
+    this.setData({ openedItemId: '' })
+    this.setItems(items)
   },
 
   toggleGroup(e) {
@@ -295,24 +320,28 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '添加中' })
-    const existingNames = fridgeStore.getCachedItems().map(item => item.name)
-    for (const item of selected) {
-      if (existingNames.includes(item.name)) continue
-      await fridgeStore.saveItem({
-        id: String(Date.now()) + item.name,
+    const existing = new Set(fridgeStore.getCachedItems().map(item => item.name))
+    const toAdd = []
+    selected.forEach(item => {
+      if (existing.has(item.name)) return
+      existing.add(item.name)
+      toAdd.push({
+        id: 'f-' + item.name,
         name: item.name,
-        amount: item.staple ? '常备' : '',
+        qty: '',
+        unit: '',
         category: item.category,
         staple: !!item.staple,
         source: 'guide',
       })
-    }
-    wx.hideLoading()
+    })
+    // 本地即时写入，云端后台同步
+    const items = fridgeStore.saveItemsBatch(toAdd)
+    if (toAdd.length) track.track('fridge_add', { source: 'guide', count: toAdd.length })
     wx.setStorageSync(GUIDE_STORAGE_KEY, true)
     this.setData({ showGuide: false })
+    this.setItems(items)
     wx.showToast({ title: '已添加基础食材', icon: 'success' })
-    this.loadItems()
   },
 
   onNameInput(e) {
@@ -325,8 +354,11 @@ Page({
     })
   },
 
-  onAmountInput(e) {
-    this.setData({ amount: e.detail.value })
+  onQtyInput(e) {
+    this.setData({ qty: e.detail.value })
+  },
+  onUnitInput(e) {
+    this.setData({ unit: e.detail.value })
   },
 
   selectCategory(e) {
@@ -344,25 +376,25 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中' })
-    const item = {
-      id: String(Date.now()),
+    const items = fridgeStore.saveItemsBatch([{
+      id: 'f-' + name,
       name,
-      amount: this.data.amount.trim(),
+      qty: this.data.qty.trim(),
+      unit: this.data.unit.trim(),
       category: this.data.category,
       staple: this.data.category === '调料',
       source: 'manual',
-    }
-    await fridgeStore.saveItem(item)
-    wx.hideLoading()
+    }])
+    track.track('fridge_add', { source: 'manual', count: 1 })
     wx.showToast({ title: '已加入', icon: 'success' })
     this.setData({
       name: '',
-      amount: '',
+      qty: '',
+      unit: '',
       category: '其他',
       categoryOptions: CATEGORIES.map(item => ({ name: item, active: item === '其他' })),
     })
-    this.loadItems()
+    this.setItems(items)
   },
 
   scanOcr() {
@@ -433,31 +465,39 @@ Page({
     this.setData({ showOcrModal: false, ocrResults: [] })
   },
 
-  async confirmOcrItems() {
+  confirmOcrItems() {
     const selected = this.data.ocrResults.filter(item => item.selected)
     if (!selected.length) {
       wx.showToast({ title: '没有勾选任何食材', icon: 'none' })
       return
     }
-    wx.showLoading({ title: '添加中…' })
-    const existingNames = fridgeStore.getCachedItems().map(item => item.name)
-    for (const item of selected) {
+    const existing = new Set(fridgeStore.getCachedItems().map(item => item.name))
+    const toAdd = []
+    selected.forEach(item => {
       const name = item.text
-      if (existingNames.includes(name)) continue
+      if (existing.has(name)) return
+      existing.add(name)
       const category = ingredientClassifier.classifyIngredient(name)
-      await fridgeStore.saveItem({
-        id: String(Date.now()) + name,
+      const parsed = amountUtils.parseAmount(item.amount || '')
+      toAdd.push({
+        id: 'f-' + name,
         name,
-        amount: item.amount || '',
+        qty: parsed.qty,
+        unit: parsed.unit,
         category,
         staple: category === '调料',
         source: 'ocr',
       })
-    }
-    wx.hideLoading()
+    })
+    // 本地即时写入，云端后台同步
+    const items = fridgeStore.saveItemsBatch(toAdd)
+    if (toAdd.length) track.track('fridge_add', { source: 'ocr', count: toAdd.length })
     this.setData({ showOcrModal: false, ocrResults: [] })
-    wx.showToast({ title: `已加入 ${selected.length} 个食材`, icon: 'success' })
-    this.loadItems()
+    this.setItems(items)
+    wx.showToast({
+      title: toAdd.length ? `已加入 ${toAdd.length} 个食材` : '这些食材冰箱里已有',
+      icon: toAdd.length ? 'success' : 'none',
+    })
   },
 
   deleteFridgeItem(e) {

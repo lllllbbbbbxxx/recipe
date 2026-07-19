@@ -7,6 +7,15 @@ miniprogram_npm/
 .DS_Store
 *.log
 
+# 大文件/导出物
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.zip
+*.rar
+*.7z
+
 # 微信私有配置（本地覆盖设置，不入库）
 project.private.config.json
 

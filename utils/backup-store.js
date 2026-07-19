@@ -55,12 +55,9 @@ async function saveCloudBackup() {
 
 async function restoreFromText(text) {
   const backup = parseBackup(text)
-  for (const dish of backup.dishes) {
-    await dishStore.saveDish({ ...dish, cloudId: '' })
-  }
-  for (const item of backup.fridgeItems) {
-    await fridgeStore.saveItem({ ...item, cloudId: '' })
-  }
+  // 批量恢复：本地即时写入，云端并行后台同步（不再逐条串行等待）
+  dishStore.saveDishesBatch(backup.dishes.map(dish => ({ ...dish, cloudId: '' })))
+  fridgeStore.saveItemsBatch(backup.fridgeItems.map(item => ({ ...item, cloudId: '' })))
   return backup
 }
 

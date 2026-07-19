@@ -2,7 +2,10 @@
   <view class="form-section">
     <view class="section-title">添加食材</view>
     <input class="input" placeholder="食材名，例如：鸡蛋" placeholder-style="color: #999; font-weight: 400;" value="{{name}}" bindinput="onNameInput" />
-    <input class="input amount-input" placeholder="数量，可选，例如：3个" placeholder-style="color: #999; font-weight: 400;" value="{{amount}}" bindinput="onAmountInput" />
+    <view class="amount-row">
+      <input class="input amount-num" type="digit" placeholder="数量" placeholder-style="color:#999;" value="{{qty}}" bindinput="onQtyInput" />
+      <input class="input amount-unit" placeholder="单位(个/g/份)" placeholder-style="color:#999;" value="{{unit}}" bindinput="onUnitInput" />
+    </view>
     <view class="category-row">
       <view
         wx:for="{{categoryOptions}}"
@@ -25,7 +28,7 @@
       <view class="ocr-desc">已自动筛掉价格、店名等噪声，并勾选了像食材的项，确认后点「加入冰箱」</view>
       <view
         wx:for="{{ocrResults}}"
-        wx:key="index"
+        wx:key="text"
         class="ocr-item"
         bindtap="toggleOcrItem"
         data-index="{{index}}"
@@ -74,7 +77,10 @@
       </view>
       <block wx:if="{{!group.collapsed}}">
         <view wx:for="{{group.items}}" wx:key="viewKey" wx:for-item="item" class="item-swipe">
-          <view wx:if="{{openedItemId === item.id}}" class="item-del-action" data-id="{{item.id}}" bindtap="deleteFridgeItem">删除</view>
+          <view wx:if="{{openedItemId === item.id}}" class="item-actions">
+            <view class="item-act-staple" data-id="{{item.id}}" data-staple="{{item.staple}}" bindtap="toggleStaple">{{item.staple ? '取消常备' : '设为常备'}}</view>
+            <view class="item-act-del" data-id="{{item.id}}" bindtap="deleteFridgeItem">删除</view>
+          </view>
           <view
             class="item-row {{openedItemId === item.id ? 'swiped' : ''}}"
             bindtouchstart="onItemTouchStart"
@@ -85,20 +91,13 @@
               <view class="item-name">{{item.name}}</view>
               <view class="item-meta {{item.freshnessClass}}">{{item.freshnessText}}</view>
             </view>
-            <!-- 非常备：可编辑数量；常备：直接显示已有数量(若有) -->
-            <input
-              wx:if="{{!item.staple}}"
-              class="item-qty-input"
-              type="text"
-              value="{{item.amount}}"
-              placeholder="数量"
-              placeholder-class="qty-ph"
-              data-id="{{item.id}}"
-              bindblur="onItemQtyInput"
-              confirm-type="done"
-              bindconfirm="onItemQtyInput"
-            />
-            <text wx:elif="{{item.qtyText}}" class="item-qty">{{item.qtyText}}</text>
+            <!-- 非常备：数字+单位 两框；常备：不显示 -->
+            <view wx:if="{{!item.staple}}" class="item-qty-box">
+              <input class="item-qty-num" type="digit" value="{{item.qty}}" placeholder="量"
+                     placeholder-class="qty-ph" data-id="{{item.id}}" bindblur="onItemQtyNum" bindconfirm="onItemQtyNum" confirm-type="done" />
+              <input class="item-qty-unit" value="{{item.unit}}" placeholder="单位"
+                     placeholder-class="qty-ph" data-id="{{item.id}}" bindblur="onItemUnit" bindconfirm="onItemUnit" confirm-type="done" />
+            </view>
           </view>
         </view>
       </block>

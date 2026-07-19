@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>随手做菜 JunCook · 产品档案 Final</title>
+  <style>
+    :root {
+      --ink: #20231f;
+      --muted: #667064;
+      --line: #dfe7dd;
+      --paper: #fbfbf7;
+      --card: #ffffff;
+      --green: #2e8f62;
+      --green-soft: #e9f5ed;
+      --yellow-soft: #fff6db;
+      --red-soft: #fff0ed;
+      --blue-soft: #eef5ff;
+      --brown: #7a5a2e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.75;
+    }
+
+    header {
+      background: #f5f8f2;
+      border-bottom: 1px solid var(--line);
+      padding: 44px 32px 34px;
+    }
+
+    .wrap {
+      width: min(1080px, calc(100vw - 40px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: 0;
+      font-weight: 780;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      max-width: 880px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 12px;
+      background: var(--card);
+      color: #405044;
+      font-size: 13px;
+    }
+
+    main {
+      padding: 38px 0 80px;
+    }
+
+    nav {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 36px;
+    }
+
+    nav h2 {
+      border: 0;
+      margin: 0 0 10px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    nav ol {
+      columns: 2;
+      gap: 28px;
+      margin: 0;
+      padding-left: 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    section {
+      margin: 38px 0;
+      padding: 30px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      padding-left: 12px;
+      border-left: 4px solid var(--green);
+      font-size: 25px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 26px 0 10px;
+      color: #1f6f49;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    h4 {
+      margin: 18px 0 8px;
+      font-size: 15px;
+      color: #3d453c;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul, ol {
+      margin-top: 8px;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f4f7f1;
+      font-weight: 700;
+      color: #3a4437;
+    }
+
+    code {
+      background: #f1f4ef;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.92em;
+      color: #246447;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 14px 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .card h3, .card h4 {
+      margin-top: 0;
+    }
+
+    .callout {
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 16px 0;
+      border: 1px solid var(--line);
+    }
+
+    .callout.green { background: var(--green-soft); }
+    .callout.yellow { background: var(--yellow-soft); }
+    .callout.red { background: var(--red-soft); }
+    .callout.blue { background: var(--blue-soft); }
+
+    .decision {
+      border-left: 4px solid var(--green);
+      background: #fbfdf9;
+      padding: 14px 18px;
+      margin: 16px 0;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .decision strong {
+      color: #195f3e;
+    }
+
+    .quote {
+      font-size: 20px;
+      line-height: 1.55;
+      font-weight: 720;
+      color: #1d2a1f;
+      margin: 16px 0;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eef5ea;
+      color: #286047;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .timeline {
+      border-left: 2px solid var(--line);
+      margin-left: 10px;
+      padding-left: 20px;
+    }
+
+    .timeline-item {
+      margin: 18px 0;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -27px;
+      top: 8px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .mono {
+      white-space: pre-wrap;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      background: #f5f7f2;
+      border: 1px solid var(--line);
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 760px) {
+      nav ol { columns: 1; }
+      .grid { grid-template-columns: 1fr; }
+      section { padding: 22px; }
+      .wrap { width: min(100vw - 28px, 1080px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>随手做菜 JunCook<br />产品档案 Final</h1>
+      <p class="subtitle">这是面向 AI 协作者、未来产品迭代和博客拆解的最终版产品档案。它不是宣传稿，也不是传统 PRD，而是一份压缩后的产品思考记录：保留关键讨论过程、取舍逻辑、被否掉的方案、当前最优方案和后续验证路径。</p>
+      <div class="meta">
+        <span class="badge">文档用途：AI 上下文 / Case Study / 博客素材</span>
+        <span class="badge">主定位：AI 做饭决策助手</span>
+        <span class="badge">副线：个人菜单与分享点菜</span>
+        <span class="badge">版本：Final Draft</span>
+        <span class="badge">日期：2026-07</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav>
+      <h2>目录</h2>
+      <ol>
+        <li>Executive Summary</li>
+        <li>Problem：为什么做</li>
+        <li>Research：用户研究</li>
+        <li>Ideation：脑暴过程</li>
+        <li>Product Decisions：关键决策</li>
+        <li>IA Evolution：信息架构演变</li>
+        <li>Algorithm Design：推荐算法</li>
+        <li>User Testing：测试设计</li>
+        <li>Metrics：埋点和指标</li>
+        <li>Roadmap：版本规划</li>
+        <li>Reflection：复盘</li>
+        <li>Blog Topics：可拆博客主题</li>
+        <li>AI Handoff：给其他 AI 的上下文</li>
+      </ol>
+    </nav>
+
+    <section id="summary">
+      <h2>1. Executive Summary</h2>
+      <p class="quote">随手做菜不是菜谱 App，也不是冰箱库存管理工具。它的核心定位是：帮助用户从“不知道吃什么”到“顺利吃上饭”。</p>
+      <p>当前最优产品方案是“AI 做饭决策助手”为主线，“个人菜单与分享点菜”为辅助增长线。库存、OCR、Vision、菜谱导入、抽卡、分享菜单都不是孤立功能，它们共同服务于一个核心目标：降低家庭做饭的决策成本。</p>
+      <div class="grid">
+        <div class="card">
+          <h3>主定位</h3>
+          <p><strong>AI 做饭决策助手</strong>：帮助用户快速决定今天吃什么，并让这个决定更符合个人菜谱、库存、偏好和近期饮食历史。</p>
+        </div>
+        <div class="card">
+          <h3>副线定位</h3>
+          <p><strong>个人菜单 / 分享菜单</strong>：用户可以建立自己的菜谱库并分享给朋友点菜。短期用于传播和验证社区文化，长期可延展到熟人点菜、家庭厨师、私厨服务。</p>
+        </div>
+      </div>
+      <h3>当前结论</h3>
+      <ul>
+        <li>用户不会因为“想管理库存”而打开产品，更可能因为“今天不知道吃什么”打开产品。</li>
+        <li>库存不是核心价值，而是提高推荐质量的辅助输入。库存功能必须尽量“少维护、低成本、可模糊”。</li>
+        <li>菜谱导入不是明星功能，但它是必要基础设施。没有个人菜谱，就没有抽卡、推荐和分享菜单。</li>
+        <li>抽卡不是随机娱乐，而是把“决策”包装成低压力、有仪式感的交互。</li>
+        <li>第一版推荐不应该依赖复杂 LLM，而应该先用可解释规则打分。真正需要 AI 的地方是降低输入成本和生成补全。</li>
+        <li>当前不应继续堆功能，应该先打磨首页 IA、菜谱导入、推荐逻辑、埋点和用户测试。</li>
+      </ul>
+      <div class="callout green">
+        <strong>一句话产品原则：</strong>不要让用户维护数据，让 AI 和轻量交互帮用户建立数据；不要让用户管理厨房，让产品帮用户决定今天吃什么。
+      </div>
+    </section>
+
+    <section id="problem">
+      <h2>2. Problem：为什么做</h2>
+      <h3>2.1 初始问题</h3>
+      <p>项目最初来自一个很生活化的场景：用户会做一些家常菜，但每天仍然会卡在“今天吃什么”这个问题上。菜谱平台很多，但它们解决的是“怎么做”，不是“做哪一个”。外卖平台很多，但它们倾向于绕过做饭本身，而不是帮助用户更容易地开始做饭。</p>
+      <p>真正的高频痛点不是“没有菜谱”，而是“做饭前的决策疲劳”。用户可能知道自己会做番茄炒蛋、土豆丝、红烧肉，但到了晚上六点，仍然会因为选择太多、库存不清楚、做饭成本不确定而放弃，最后点外卖。</p>
+
+      <h3>2.2 真实问题拆解</h3>
+      <table>
+        <tr><th>表层问题</th><th>深层问题</th><th>产品机会</th></tr>
+        <tr><td>不知道今天吃什么</td><td>日常重复决策消耗精力</td><td>用推荐/抽卡降低决策成本</td></tr>
+        <tr><td>冰箱里有什么不清楚</td><td>库存信息缺失，推荐缺少上下文</td><td>低成本库存快照，而不是精确库存管理</td></tr>
+        <tr><td>食材放坏浪费</td><td>用户不会主动记住保质期</td><td>临期提醒 + 优先消耗推荐</td></tr>
+        <tr><td>菜谱录入麻烦</td><td>推荐系统缺少个人菜谱数据</td><td>AI 导入、模板导入、截图导入，减少手填</td></tr>
+        <tr><td>想分享自己会做的菜</td><td>个人菜单可能具有社交和商业潜力</td><td>分享菜单，后续扩展点菜/私厨</td></tr>
+      </table>
+
+      <h3>2.3 为什么不是普通菜谱 App</h3>
+      <p>传统菜谱 App 的核心逻辑是“搜索菜谱 → 学做菜”。随手做菜的核心逻辑是“我今天要吃饭 → 帮我决定做什么 → 如果需要再看菜谱”。这两个方向的首页、信息架构、推荐算法和数据模型完全不同。</p>
+      <div class="decision">
+        <strong>定位取舍：</strong>不做“更多菜谱”，而做“更快决策”。用户不缺菜谱内容，缺的是根据个人情况做选择的帮助。
+      </div>
+
+      <h3>2.4 为什么不是冰箱管理工具</h3>
+      <p>冰箱库存管理听起来刚需，但长期维护成本极高。买菜要录入，做菜要扣减，过期要删除，几次忘记后数据就失真。很多类似产品不火，很大概率不是因为需求不存在，而是因为“维护成本大于收益”。</p>
+      <p>因此，库存应该被重新定义为“推荐辅助信息”，而不是产品的核心入口。产品不应该要求用户像仓库管理员一样管理冰箱，而应该允许模糊、近似、偶尔更新。</p>
+      <div class="decision">
+        <strong>核心判断：</strong>库存不是需求本身，顺利决定吃什么才是需求。库存只在它能帮助用户更快做决定时才有价值。
+      </div>
+    </section>
+
+    <section id="research">
+      <h2>3. Research：用户研究</h2>
+      <h3>3.1 已获得的用户反馈线索</h3>
+      <p>目前的反馈主要来自体验版用户、朋友讨论和产品自测，尚未形成严格的样本研究。已有反馈可以归纳为四类：</p>
+      <table>
+        <tr><th>反馈主题</th><th>用户表达</th><th>产品解释</th><th>影响</th></tr>
+        <tr><td>库存维护麻烦</td><td>买完放进去就忘了、懒得更新</td><td>录入成本高于用户动力</td><td>推动 OCR、Vision、常备食材引导</td></tr>
+        <tr><td>希望有时间提醒</td><td>快过期前提醒我</td><td>用户关心的不是库存列表，而是“要赶紧用什么”</td><td>推动临期提醒与优先消耗推荐</td></tr>
+        <tr><td>不想重复吃</td><td>能不能别老推荐一样的菜</td><td>随机推荐质量不足，需要历史降权</td><td>推动不重复推荐和推荐接受率指标</td></tr>
+        <tr><td>输入要更轻</td><td>截图订单识别、拍冰箱、拍购物袋</td><td>用户愿意给系统信息，但不愿手动维护结构化数据</td><td>确立“导入优先于录入”的设计原则</td></tr>
+      </table>
+
+      <h3>3.2 需要验证的核心问题</h3>
+      <p>下一轮研究不应该问“你喜欢哪个功能”，而应该通过任务观察用户行为。当前最关键的研究问题是：</p>
+      <ol>
+        <li>用户第一次打开产品时，第一反应是“我要选菜”还是“我要管理库存”？</li>
+        <li>用户是否愿意建立个人菜谱库？如果愿意，愿意录到什么程度？</li>
+        <li>库存精确度对用户是否重要？还是只需要一个大概？</li>
+        <li>抽卡/推荐是否真的能减少决策负担？还是只是一个好玩的入口？</li>
+        <li>分享菜单是否有自然传播需求？朋友是否愿意点进别人的菜单？</li>
+      </ol>
+
+      <h3>3.3 研究方法建议</h3>
+      <p>不建议以问卷为主。问卷适合验证偏好，不适合观察真实操作。建议用 5-8 个陌生用户做任务测试，每人 10-15 分钟，录屏并记录关键行为。</p>
+      <div class="grid">
+        <div class="card">
+          <h3>任务 1：不知道吃什么</h3>
+          <p>给用户一句场景：“现在晚上六点，你不知道今天吃什么，请用这个小程序解决。”观察用户是否点抽卡、是否查看菜谱、是否理解下一步。</p>
+        </div>
+        <div class="card">
+          <h3>任务 2：刚买完菜</h3>
+          <p>让用户模拟刚买完菜，看看他是否愿意进入库存，是否选择 OCR，是否愿意确认识别结果。</p>
+        </div>
+        <div class="card">
+          <h3>任务 3：冰箱有些菜快坏了</h3>
+          <p>观察用户是否理解临期提醒，是否愿意根据库存推荐做菜。</p>
+        </div>
+        <div class="card">
+          <h3>任务 4：分享自己的菜单</h3>
+          <p>观察用户是否理解“我的菜单”，是否愿意分享，是否觉得这是社交功能还是工具功能。</p>
+        </div>
+      </div>
+
+      <h3>3.4 测试用户来源</h3>
+      <p>已有体验者群约 10–15 人（朋友为主），可作为第一轮快速反馈；但朋友容易说好话，第二轮建议找陌生目标用户，反馈更真实。渠道包括小红书、豆瓣做饭小组、微信群、留学生群、健身/减脂餐群。私信话术要轻量，不要像推广。</p>
+      <div class="callout blue">
+        <strong>建议私信：</strong>“我在做一个帮助解决‘今天吃什么’的小程序，想找经常做饭的人体验 10 分钟，不卖东西，只想听真实意见。可以的话我发你体验版二维码。”
+      </div>
+    </section>
+
+    <section id="ideation">
+      <h2>4. Ideation：脑暴过程</h2>
+      <p>这个项目经历了多轮发散和收敛。最重要的不是想到多少功能，而是逐渐看清哪些是核心、哪些是辅助、哪些只是未来想象。</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h3>阶段 1：餐厅点菜式个人菜单</h3>
+          <p>最初想法是把自己会做的菜录入小程序，像餐厅点菜一样选择今日菜单。价值在于把“我会做什么”结构化。</p>
+          <p><strong>保留：</strong>个人菜单是数据基础。<strong>调整：</strong>它不是首页核心，而是支撑推荐和分享的基础。</p>
+        </div>
+        <div class="timeline-item">
+          <h3>阶段 2：随机抽菜</h3>
+          <p>为了解决选择困难，加入“今天吃什么”随机抽卡。这个方向符合决策产品的核心，但纯随机容易导致用户一直重抽。</p>
+          <p><strong>保留：</strong>抽卡作为低压力决策交互。<strong>调整：</strong>从纯随机升级为加权推荐。</p>
+        </div>
+        <div class="timeline-item">
+          <h3>阶段 3：冰箱库存推荐</h3>
+          <p>想到如果知道冰箱里有什么，就可以推荐能做的菜。这让产品从“随机选菜”升级为“有上下文的推荐”。</p>
+          <p><strong>保留：</strong>库存作为推荐输入。<strong>调整：</strong>不再把库存管理作为核心卖点。</p>
+        </div>
+        <div class="timeline-item">
+          <h3>阶段 4：OCR / Vision 降低录入成本</h3>
+          <p>用户反馈库存维护麻烦后，开始探索订单截图 OCR、购物袋拍照、冰箱拍照。核心不在 AI 识别炫技，而在降低用户输入成本。</p>
+          <p><strong>保留：</strong>OCR 已作为低成本入库方式。<strong>后续：</strong>Vision 先做购物袋，再考虑冰箱快照。</p>
+        </div>
+        <div class="timeline-item">
+          <h3>阶段 5：分享菜单与点菜</h3>
+          <p>从“我自己决定吃什么”发散到“别人可以看我的菜单并点菜”。这条线具有社区和商业化潜力，但如果太早做私厨平台，会严重发散。</p>
+          <p><strong>保留：</strong>先做朋友分享菜单。<strong>暂缓：</strong>私厨平台、配送、自取、支付、上门做饭。</p>
+        </div>
+        <div class="timeline-item">
+          <h3>阶段 6：重新收敛到主定位</h3>
+          <p>最终收敛为“AI 做饭决策助手”为主，分享菜单为辅。所有功能必须服务于“从不知道吃什么到顺利吃上饭”。</p>
+        </div>
+      </div>
+
+      <h3>被讨论但暂缓的方向</h3>
+      <table>
+        <tr><th>方向</th><th>为什么有吸引力</th><th>为什么暂缓</th></tr>
+        <tr><td>营养分析</td><td>看起来 AI 感强，适合健康饮食</td><td>不是当前最强痛点，容易跑偏成健康管理产品</td></tr>
+        <tr><td>自动采购</td><td>能闭环“缺什么买什么”</td><td>依赖第三方平台和外部接口，早期复杂度过高</td></tr>
+        <tr><td>上门做饭 / 私厨平台</td><td>商业想象空间大</td><td>服务重、标准化难、信任和合规问题复杂，适合作为长期商业化方向</td></tr>
+        <tr><td>精确冰箱库存</td><td>理论上推荐更准确</td><td>维护成本太高，用户很难长期坚持</td></tr>
+        <tr><td>完整 AI Chat</td><td>符合 AI 产品趋势</td><td>用户不一定想聊天，AI 应隐藏在决策流程后面</td></tr>
+      </table>
+    </section>
+
+    <section id="decisions">
+      <h2>5. Product Decisions：关键决策及原因</h2>
+
+      <div class="decision">
+        <strong>决策 1：主定位从“冰箱库存管理”转向“AI 做饭决策助手”。</strong>
+        <p>原因：库存维护成本过高，用户不会为了管理库存持续打开产品。真正高频场景是“不知道今天吃什么”。库存只在帮助推荐时有价值。</p>
+        <p>影响：首页不应围绕库存，而应围绕“今天吃什么”；库存入口下沉，变成辅助信息。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 2：菜谱导入是必要基础设施，但不是明星功能。</strong>
+        <p>原因：没有个人菜谱库，就无法抽卡、推荐、分享菜单。但用户不会因为“可以录菜谱”而使用产品。</p>
+        <p>影响：菜谱功能要轻、快、低压力。优先做导入，不优先做复杂编辑器。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 3：所有“录入”都应优先思考“导入”。</strong>
+        <p>原因：手动输入是这类产品最大的流失点。AI 的价值不是炫技，而是替用户建立初始数据。</p>
+        <p>影响：库存用 OCR / Vision；菜谱用 AI 导入 / 模板导入 / 截图导入；偏好从行为学习。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 4：抽卡从纯随机改为加权推荐。</strong>
+        <p>原因：纯随机会降低信任，用户会一直重抽。抽卡本质是推荐的交互包装，不是骰子。</p>
+        <p>影响：推荐算法需要考虑库存、最近吃过、偏好、临期食材、缺少类别等因素。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 5：第一版推荐用规则算法，不急着上 LLM。</strong>
+        <p>原因：早期数据少，推荐不好的主要原因不是模型弱，而是输入不完整。规则算法更可控、可解释、便于调试和埋点分析。</p>
+        <p>影响：LLM 暂时用于导入、生成步骤、补全标签，而不是直接决定推荐结果。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 6：分享菜单是增长副线，不是当前主首页。</strong>
+        <p>原因：分享菜单有商业化潜力，但如果过早做成平台，会稀释“今天吃什么”的主定位。</p>
+        <p>影响：先做“朋友分享菜单 + 点菜”，验证自然传播；私厨、支付、配送、自取放后面。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 7：Vision 方向优先“购物袋拍照”，其次才是“冰箱拍照”。</strong>
+        <p>原因：冰箱场景遮挡多、光线差、物品不透明，识别难。购物袋/桌面食材更平铺，识别准确率更高。</p>
+        <p>影响：Vision 不作为当前核心 MVP，而作为 OCR 后的下一步库存录入增强。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 8（补充）：识别第一版选腾讯云 OCR，而不是 LLM Vision API。</strong>
+        <p>原因：通用印刷体 OCR 每月有免费额度、延迟低、结果稳定；LLM Vision 更聪明但更贵、更慢、输出不稳定。识别只是入口，真正的产品价值在 OCR 之后的<strong>噪声后处理</strong>（过滤价格/店名/广告、提取"菜名+重量"、食材词库校验）——这层自己写规则比换更强的模型收益更大。</p>
+        <p>影响：识别成本近乎为零地跑通了闭环；LLM Vision 留作 V1.5 购物袋场景再评估。</p>
+      </div>
+
+      <div class="decision">
+        <strong>决策 9（补充）：订单的所有写操作收进云函数（orderAction），客户端不再直写。</strong>
+        <p>原因：来自真实教训——好友点单是"别人写你的数据"，客户端安全规则做跨用户写反复踩坑（标记完成/删除接连失败）；服务端校验一次性解决，还顺带拿到了建单限频（10 单/人/小时）和删单清理头像文件的位置。</p>
+        <p>影响：确立"跨用户写一律走云函数"的架构红线；信任与防滥用的基础在增长动作之前就位。</p>
+      </div>
+    </section>
+
+    <section id="ia">
+      <h2>6. IA Evolution：信息架构演变</h2>
+      <p>当前最大挑战不是“还有哪些功能”，而是“哪些功能应该在什么时候出现在用户面前”。IA 的目标是让用户第一次打开就知道该做什么，同时随着数据变多逐步展示更强能力。</p>
+
+      <h3>6.1 早期 IA 问题</h3>
+      <p>早期产品容易把“库存、菜谱、抽卡、OCR、分享、备份”等入口并列放出来。这会让用户误以为这是一个功能集合，而不是一个有明确路径的决策助手。用户首次打开时会问：我到底应该先点哪个？</p>
+
+      <h3>6.2 当前推荐 IA</h3>
+      <div class="mono">首页 Today
+├── 当前主任务：今天吃什么
+│   ├── 用户菜谱不足：引导添加 / 导入菜谱
+│   ├── 菜谱足够：开始抽卡 / 推荐
+│   └── 有库存数据：库存优先推荐 / 临期提醒
+├── 今日菜单
+└── 轻提示：库存 / 导入 / 分享
+
+我的菜单
+├── 我的菜谱
+├── 导入菜谱
+├── 分享菜单
+└── 菜谱编辑
+
+库存
+├── 当前食材
+├── OCR 入库
+├── Vision 入库（未来）
+└── 常备食材
+
+点单 / 分享
+├── 分享记录
+├── 好友选单
+└── 我收到的点单
+
+我的
+├── 设置
+├── 数据备份
+└── 隐私 / 帮助</div>
+
+      <h3>6.3 首页根据用户成熟度变化</h3>
+      <table>
+        <tr><th>用户状态</th><th>首页主信息</th><th>主 CTA</th><th>原因</th></tr>
+        <tr><td>0 道菜谱</td><td>先建立你的菜单</td><td>导入 / 添加第一道菜</td><td>没有菜谱无法推荐，抽卡无意义</td></tr>
+        <tr><td>1-4 道菜谱</td><td>继续补充你会做的菜</td><td>一键导入家常菜 / 继续添加</td><td>数据太少，推荐重复度高</td></tr>
+        <tr><td>5-15 道菜谱</td><td>今天吃什么</td><td>开始抽卡</td><td>可以进入核心价值</td></tr>
+        <tr><td>有库存数据</td><td>基于库存推荐</td><td>优先吃这些 / 抽一顿</td><td>库存开始提高推荐质量</td></tr>
+        <tr><td>有分享行为</td><td>我的菜单有人点</td><td>查看点单 / 再次分享</td><td>启动副线增长</td></tr>
+      </table>
+
+      <div class="callout yellow">
+        <strong>IA 原则：</strong>不要把所有功能都放在首页。首页只回答一个问题：用户此刻最应该做什么，才能更快进入“今天吃什么”的核心价值。
+      </div>
+    </section>
+
+    <section id="algorithm">
+      <h2>7. Algorithm Design：推荐算法</h2>
+      <h3>7.1 推荐目标</h3>
+      <p>推荐算法不是为了“技术先进”，而是为了提高“推荐被接受率”。如果用户抽到菜后一直重抽，说明推荐质量不够。如果用户抽到后进入菜谱、加入今日菜单或点击“就做这个”，说明推荐有效。</p>
+
+      <h3>7.2 当前推荐输入</h3>
+      <ul>
+        <li><strong>个人菜谱：</strong>菜名、食材、标签、类型、做法步骤、最近做过时间。</li>
+        <li><strong>库存：</strong>食材名称、数量、单位、是否常备、是否临期、是否过期。</li>
+        <li><strong>行为：</strong>抽卡、重抽、接受推荐、加入今日菜单、做完菜。</li>
+        <li><strong>偏好：</strong>喜欢标签、常做类型、被重抽降权的菜。</li>
+      </ul>
+
+      <h3>7.3 推荐分层</h3>
+      <table>
+        <tr><th>层级</th><th>功能</th><th>规则</th></tr>
+        <tr><td>可做判断</td><td>判断是否能抽到</td><td>主料和关键食材必须满足；调料/可选料不阻断</td></tr>
+        <tr><td>库存权重</td><td>优先消耗已有食材</td><td>库存齐全加分，临期食材加分，过期食材不计入</td></tr>
+        <tr><td>历史权重</td><td>减少重复</td><td>48 小时内做过降权，长期没做轻微加权</td></tr>
+        <tr><td>偏好权重</td><td>更贴合用户</td><td>接受过的标签加权，频繁重抽的标签降权</td></tr>
+        <tr><td>菜单搭配</td><td>让一顿饭更完整</td><td>今日菜单缺荤/素/汤时对应类别加权</td></tr>
+      </table>
+
+      <h3>7.4 推荐公式草案</h3>
+      <div class="mono">score(recipe) =
+  base_match_score
+  + inventory_score
+  + expiring_ingredient_bonus
+  + preference_score
+  + novelty_score
+  + meal_balance_score
+  - recent_cooked_penalty
+  - repeated_redraw_penalty</div>
+
+      <h3>7.5 为什么第一版不用 LLM 直接推荐</h3>
+      <p>LLM 推荐的问题是解释性和稳定性较弱，而且早期缺少用户行为数据。当前更重要的是建立可观测的规则系统：为什么这道菜被推荐、用户是否接受、哪些因素提升接受率。LLM 更适合做这些辅助任务：</p>
+      <ul>
+        <li>从菜名和食材生成做法步骤。</li>
+        <li>从截图/链接中抽取菜谱结构。</li>
+        <li>归一化食材名称和同义词，例如西红柿 → 番茄，五花肉 → 猪肉子类。</li>
+        <li>生成分享卡片文案或情绪型推荐语。</li>
+      </ul>
+
+      <h3>7.6 需要观察的推荐指标</h3>
+      <ul>
+        <li><code>recommend_view</code>：看到了推荐。</li>
+        <li><code>recommend_redraw</code>：重抽，说明不满意或想探索。</li>
+        <li><code>recipe_view</code>：点进菜谱，说明产生兴趣。</li>
+        <li><code>recommend_accept</code>：加入今日菜单或点击“就做这个”。</li>
+        <li><code>meal_cooked</code>：做完并扣库存，说明完成闭环。</li>
+      </ul>
+      <p><em>注：<code>recipe_view</code> 依赖菜谱详情页，当前未实现；其余事件名与代码的对应关系见 9.2.1 映射表。</em></p>
+    </section>
+
+    <section id="testing">
+      <h2>8. User Testing：测试记录与计划</h2>
+      <h3>8.1 测试目标</h3>
+      <p>测试不是为了证明产品“好不好”，而是为了回答三个方向性问题：</p>
+      <ol>
+        <li>用户真正的入口是不是“今天吃什么”？</li>
+        <li>用户是否愿意建立个人菜谱库？如果不愿意，哪种导入方式能降低门槛？</li>
+        <li>库存对推荐是否真的有帮助？用户愿意维护到什么精度？</li>
+      </ol>
+
+      <h3>8.2 任务测试脚本</h3>
+      <div class="card">
+        <h4>开场说明</h4>
+        <p>“这不是测试你会不会用，而是测试产品有没有设计清楚。你正常操作就好，遇到任何不懂的地方直接说出来。”</p>
+      </div>
+      <table>
+        <tr><th>任务</th><th>给用户的场景</th><th>观察点</th></tr>
+        <tr><td>首次打开</td><td>你刚打开这个小程序，想看看它能帮你什么</td><td>第一眼看哪里、是否理解产品、是否知道下一步</td></tr>
+        <tr><td>建立菜单</td><td>请添加几道你会做的菜</td><td>是否愿意手动输入、是否找导入、在哪一步放弃</td></tr>
+        <tr><td>决定晚饭</td><td>现在晚上六点，你不知道吃什么</td><td>是否点抽卡、是否重抽、是否进入菜谱</td></tr>
+        <tr><td>库存入库</td><td>你刚买完菜，想让系统知道你有什么</td><td>是否选 OCR、是否觉得确认列表麻烦、是否需要精确数量</td></tr>
+        <tr><td>分享菜单</td><td>你想把自己会做的菜发给朋友看看</td><td>是否理解分享对象、是否愿意让别人点菜</td></tr>
+      </table>
+
+      <h3>8.3 测试记录模板</h3>
+      <div class="mono">用户编号：
+背景：是否经常做饭 / 是否独居 / 是否买菜 / 是否用菜谱 App
+
+任务 1 首次打开：
+- 第一点击：
+- 卡住点：
+- 用户原话：
+
+任务 2 建立菜单：
+- 添加了几道菜：
+- 放弃原因：
+- 是否需要导入：
+
+任务 3 今天吃什么：
+- 是否点击抽卡：
+- 重抽次数：
+- 是否接受推荐：
+
+任务 4 库存：
+- 是否主动进入库存：
+- 是否愿意 OCR：
+- 对精确度的要求：
+
+任务 5 分享菜单：
+- 是否理解：
+- 是否愿意分享：
+- 是否觉得点菜场景自然：
+
+结论：
+- 最大卡点：
+- 需要改的功能：
+- 不应该继续做的功能：</div>
+
+      <h3>8.4 目前应避免的测试方式</h3>
+      <ul>
+        <li>不要直接问“你觉得库存重要吗”，因为用户会给理想化答案。</li>
+        <li>不要只找朋友，朋友容易说好话。</li>
+        <li>不要用大问卷替代任务观察，当前阶段要找方向，不是做市场规模统计。</li>
+      </ul>
+    </section>
+
+    <section id="metrics">
+      <h2>9. Metrics：埋点和指标</h2>
+      <h3>9.1 埋点原则</h3>
+      <p>埋点不是为了收集更多数据，而是为了回答产品问题。当前埋点应控制在 15-20 个核心事件以内，重点覆盖“首次行为、菜谱建立、推荐接受、库存维护、分享转化”。</p>
+
+      <h3>9.2 核心事件</h3>
+      <table>
+        <tr><th>问题</th><th>事件</th><th>解释</th></tr>
+        <tr><td>用户知道下一步吗</td><td><code>app_open</code>, <code>home_enter</code>, <code>first_action</code></td><td>看首次打开后第一步点哪里</td></tr>
+        <tr><td>用户愿意建菜谱吗</td><td><code>recipe_add_start</code>, <code>recipe_add_success</code>, <code>recipe_import_done</code></td><td>看开始和完成之间流失</td></tr>
+        <tr><td>抽卡是否有效</td><td><code>recommend_view</code>, <code>recommend_redraw</code>, <code>recommend_accept</code></td><td>看推荐被接受率和重抽率</td></tr>
+        <tr><td>是否真的做饭</td><td><code>cook_start</code>, <code>meal_cooked</code>, <code>inventory_deduct</code></td><td>看是否完成从推荐到消耗库存的闭环</td></tr>
+        <tr><td>库存是否被维护</td><td><code>inventory_enter</code>, <code>fridge_add</code>, <code>fridge_ocr</code>, <code>fridge_qty_edit</code></td><td>看库存是核心还是偶尔辅助</td></tr>
+        <tr><td>分享是否有增长潜力</td><td><code>menu_share</code>, <code>share_open</code>, <code>order_submit</code>, <code>shared_user_onboard</code></td><td>看分享菜单是否形成传播</td></tr>
+      </table>
+
+      <h3>9.2.1 事件名映射与实现状态（查漏补充 · 以代码为准）</h3>
+      <p>上表是规划命名；实际代码（<code>utils/track.js</code> + <code>analytics</code> 云函数）已实现一套事件，名称有出入。<strong>查数据、写分析一律以下表"代码名"为准</strong>；标"待建"的事件当前不存在，引用前需先实现。</p>
+      <table>
+        <tr><th>档案名</th><th>代码名（实际）</th><th>状态</th></tr>
+        <tr><td>home_enter</td><td><code>page_view</code>{page:'menu'}</td><td>✅ 已有</td></tr>
+        <tr><td>recipe_add_success</td><td><code>dish_add_success</code></td><td>✅ 已有</td></tr>
+        <tr><td>recipe_import_done</td><td><code>dish_import_done</code></td><td>✅ 已有</td></tr>
+        <tr><td>recipe_add_start / recipe_view / cook_start</td><td>—</td><td>○ 待建（做菜谱详情页时一起加）</td></tr>
+        <tr><td>inventory_enter</td><td><code>page_view</code>{page:'fridge'}</td><td>✅ 已有</td></tr>
+        <tr><td>fridge_ocr</td><td><code>fridge_add</code>{source:'ocr'}</td><td>✅ 已有（source 区分 manual/ocr/guide）</td></tr>
+        <tr><td>inventory_deduct</td><td><code>meal_cooked</code>{consumed}</td><td>✅ 已有（做完菜扣减时上报）</td></tr>
+        <tr><td>shared_user_onboard</td><td>—</td><td>○ 待建（被分享者转化钩子上线时加；当前 analytics 用"首事件为 share_open 且后续有建库行为"近似）</td></tr>
+        <tr><td>（档案未列）</td><td><code>meal_decided</code>、<code>order_edit/delete</code>、<code>order_accept_to_menu</code>、<code>order_mark_done</code>、<code>fridge_qty_edit</code>、<code>app_hide</code>、<code>first_action</code></td><td>✅ 已有，每条事件带 <code>appVersion</code></td></tr>
+      </table>
+
+      <h3>9.3 北极星指标</h3>
+      <div class="callout green">
+        <strong>推荐北极星指标：</strong>每周通过产品完成的做饭决策次数。具体口径：一周内用户触发 <code>recommend_accept</code> 或 <code>meal_cooked</code> 的次数。
+      </div>
+      <p>这个指标比“库存数量”“菜谱数量”“打开次数”更贴近产品定位。因为随手做菜真正要证明的是：它是否帮用户完成了“今天吃什么”的决策。</p>
+      <div class="callout yellow">
+        <strong>口径对齐（查漏补充）：</strong>当前 <code>analytics</code> 云函数实现的"周决策次数"统计的是 <code>meal_decided</code> 会话数（打开今日菜单面板即算），比本节定义的 <code>recommend_accept 或 meal_cooked</code> 更宽松。验证期看数时以本节口径为准（手动取这两个事件），Phase 1 时应把 analytics 的北极星口径改齐——三处（本档案 / GROWTH_ROADMAP / analytics 代码）必须统一，否则前后对比会失真。</div>
+
+      <h3>9.4 关键派生指标</h3>
+      <ul>
+        <li><strong>首日激活率：</strong>首次打开当天完成添加菜谱、抽卡、库存入库或分享之一。</li>
+        <li><strong>推荐接受率：</strong><code>recommend_accept / recommend_view</code>。</li>
+        <li><strong>重抽率：</strong><code>recommend_redraw / recommend_view</code>，过高说明推荐不够可信。</li>
+        <li><strong>菜谱建立率：</strong>首次打开后 24 小时内菜谱数 ≥ 5 的用户比例。</li>
+        <li><strong>库存维护率：</strong>7 天内至少一次新增/编辑/扣减库存的用户比例。</li>
+        <li><strong>分享转化率：</strong>菜单分享打开后提交点单或建立自己菜单的比例。</li>
+        <li><strong>次日/七日留存（补充）：</strong>首个 <code>app_open</code> 后第 2/第 7 天仍有打开（PRD 目标：7 日留存 ≥ 40%）。做饭是日常行为，留存不达标说明产品没进入习惯——analytics 已实现该口径。</li>
+      </ul>
+    </section>
+
+    <section id="roadmap">
+      <h2>10. Roadmap：版本规划</h2>
+      <div class="callout blue">
+        <strong>版本体系对照（查漏补充）：</strong>项目并存三套编号——本章的产品版本（V1.3/V1.4…）、微信发布号（当前 1.0.9，见 <code>utils/track.js</code> 的 APP_VERSION）、GROWTH_ROADMAP.html 的执行阶段（Phase 0–3）。对应关系：<strong>V1.3+V1.4 ≈ Phase 0（验证）+ Phase 1（留存）；V1.5/V2.0 ≈ Phase 2（增长）；V3.0 ≈ Phase 3（商业化）</strong>。产品方向以本章为准，任务拆解与验收指标以 GROWTH_ROADMAP 为准，两边冲突时先对齐再动手。
+      </div>
+      <h3>V1.3：核心体验打磨</h3>
+      <table>
+        <tr><th>优先级</th><th>任务</th><th>目标</th></tr>
+        <tr><td>P0</td><td>首页 Onboarding 动态化</td><td>根据菜谱数量和库存状态引导用户下一步</td></tr>
+        <tr><td>P0</td><td>菜谱导入</td><td>支持模板导入、截图/OCR 导入、AI 解析，降低启动成本</td></tr>
+        <tr><td>P0</td><td>抽卡体验优化</td><td>提升视觉和交互，降低决策压力</td></tr>
+        <tr><td>P1</td><td>规则推荐升级 <strong>◑ 部分完成</strong></td><td>最近没吃(48h 降权)、库存齐全、临期、菜单搭配已上线（v1.0.9）；<strong>偏好权重待 Phase 0 拿到行为数据后做</strong></td></tr>
+        <tr><td>P1</td><td>基础埋点补齐 <strong>✅ 已完成</strong></td><td>20 类事件 + analytics 留存/漏斗/按天聚合已上线，见 9.2.1 映射表</td></tr>
+        <tr><td>P0</td><td>订阅消息召回（补充项）</td><td>临期提醒/接单通知走微信订阅消息——目前产品<strong>没有任何让用户回来的机制</strong>，这是留存的第一杠杆，原档案漏列</td></tr>
+      </table>
+
+      <h3>V1.4：用户测试与数据迭代</h3>
+      <ul>
+        <li>找 5-8 个陌生用户做任务测试。</li>
+        <li>根据测试结果调整首页、菜谱导入和抽卡路径。</li>
+        <li>分析埋点，判断库存是否应该继续作为强入口。</li>
+        <li>不新增大型功能，优先修核心体验。</li>
+        <li><strong>合规（补充项，发布硬门槛）：</strong>mp 后台配置《用户隐私保护指引》（收集 openid/头像昵称/使用日志，不配审核过不了）；用户上传头像接 <code>security.imgSecCheck</code> 内容安全检测。</li>
+      </ul>
+
+      <h3>V1.5：Vision 与库存轻量化</h3>
+      <ul>
+        <li>优先做购物袋 Vision，而不是冰箱 Vision。</li>
+        <li>识别结果必须让用户确认，不直接自动入库。</li>
+        <li>库存只追求“大致知道有什么”，不追求仓库级精确。</li>
+      </ul>
+
+      <h3>V2.0：分享菜单增长线</h3>
+      <ul>
+        <li>完善分享菜单页面和分享卡片。</li>
+        <li>好友点单成功后引导“我也要建立自己的菜单”。</li>
+        <li>验证熟人点菜是否能形成自然传播。</li>
+        <li>暂不做支付、配送、自取、平台撮合。</li>
+      </ul>
+
+      <h3>V3.0：商业化探索</h3>
+      <ul>
+        <li>如果分享点菜有效，再探索家庭厨师/私厨方向。</li>
+        <li>如果推荐接受率高，再探索会员订阅、高级推荐、家庭共享。</li>
+        <li>如果缺料清单使用高，再探索自动采购/平台跳转。</li>
+      </ul>
+    </section>
+
+    <section id="reflection">
+      <h2>11. Reflection：复盘</h2>
+      <h3>11.1 最大认知变化</h3>
+      <p>一开始，这个项目容易被理解为“冰箱库存 + 菜谱推荐”。但经过讨论后，发现这个定位很容易掉进维护成本陷阱。真正更有生命力的定位是“AI 做饭决策助手”。用户不一定想管理厨房，但确实经常不知道今天吃什么。</p>
+
+      <h3>11.2 这个项目最有价值的能力展示</h3>
+      <ul>
+        <li><strong>产品定位收敛：</strong>从功能集合收敛为“决策助手”。</li>
+        <li><strong>用户体验判断：</strong>识别到库存维护成本是最大风险。</li>
+        <li><strong>AI 产品思维：</strong>AI 不作为表层噱头，而用于降低输入成本和提高推荐质量。</li>
+        <li><strong>数据意识：</strong>用埋点验证假设，而不是凭感觉继续加功能。</li>
+        <li><strong>商业化想象但保持克制：</strong>分享菜单有私厨潜力，但短期不做平台。</li>
+      </ul>
+
+      <h3>11.3 当前最大风险</h3>
+      <table>
+        <tr><th>风险</th><th>表现</th><th>应对</th></tr>
+        <tr><td>用户不愿建立菜谱</td><td>抽卡无数据、推荐重复</td><td>模板导入 + AI 导入 + 截图导入</td></tr>
+        <tr><td>库存维护失败</td><td>推荐失真、用户放弃</td><td>库存降级为辅助，OCR/Vision 降低成本</td></tr>
+        <tr><td>功能过度发散</td><td>首页混乱、定位模糊</td><td>所有功能必须服务“今天吃什么”</td></tr>
+        <tr><td>分享菜单变成另一个产品</td><td>偏向私厨平台，复杂度暴涨</td><td>先只做熟人菜单分享，不做交易闭环</td></tr>
+      </table>
+      <div class="callout yellow">
+        <strong>量化止损线（补充，与 GROWTH_ROADMAP 对齐）：</strong>风险要有可触发的转向条件，不能只有定性描述——
+        ① 库存维护率 &lt; 30% 或做完菜扣库存率 &lt; 20% → 启动"无库存轻量版"（库存降为可选，主打抽卡决策 + 分享点菜）；
+        ② 库存齐全(ready)与缺料(miss)的推荐接受率差 &lt; 5pp → 停止偏好权重投入，推荐退化为简单规则；
+        ③ 被分享者建库转化 &lt; 5% → 放弃裂变依赖，转内容渠道（小红书等）获客。
+      </div>
+
+      <h3>11.4 最重要的设计原则</h3>
+      <div class="quote">不是帮助用户学会做饭，而是帮助用户更快决定做什么饭。</div>
+      <p>这个原则可以判断所有后续功能：如果一个功能不能帮助用户更快决定吃什么，或者不能降低决策前的数据建立成本，就应该暂缓。</p>
+    </section>
+
+    <section id="blog">
+      <h2>12. Blog Topics：可拆成博客的主题</h2>
+      <p>以下内容可以从这份档案中拆成系列文章。每个主题都适合写成产品思考、AI 产品实践或作品集复盘。</p>
+      <table>
+        <tr><th>主题</th><th>核心观点</th><th>可用章节</th></tr>
+        <tr><td>为什么“冰箱库存 + 菜谱”很难火</td><td>维护成本大于收益，库存不是需求本身</td><td>Problem / Decisions / Reflection</td></tr>
+        <tr><td>AI 产品不要让用户录数据</td><td>AI 的价值是降低输入成本，而不是增加表单</td><td>Ideation / Decisions</td></tr>
+        <tr><td>从“菜谱 App”到“做饭决策助手”</td><td>用户不缺内容，缺决策</td><td>Problem / IA Evolution</td></tr>
+        <tr><td>为什么抽卡是一个好交互</td><td>把选择压力转成轻量仪式感</td><td>Ideation / Algorithm</td></tr>
+        <tr><td>推荐算法第一版为什么不用 LLM</td><td>早期需要可解释规则和可观测指标</td><td>Algorithm Design</td></tr>
+        <tr><td>如何做一个会成长的首页</td><td>首页根据用户成熟度变化，而不是所有人一个样</td><td>IA Evolution</td></tr>
+        <tr><td>一个小程序如何从工具走向社区</td><td>个人菜单 → 分享菜单 → 熟人点菜 → 私厨想象</td><td>Ideation / Roadmap</td></tr>
+        <tr><td>如何用埋点验证产品定位</td><td>埋点不是统计，而是验证假设</td><td>Metrics / User Testing</td></tr>
+        <tr><td>为什么要保留被否掉的方案</td><td>被否掉的方案记录了真正的产品判断</td><td>Product Decisions / Reflection</td></tr>
+      </table>
+    </section>
+
+    <section id="handoff">
+      <h2>13. AI Handoff：给其他 AI 的上下文</h2>
+      <div class="callout blue">
+        <strong>如果你是接手这个项目的 AI，请先读这一段。</strong>
+      </div>
+
+      <h3>配套文档地图（补充 · 必读顺序）</h3>
+      <table>
+        <tr><th>文档</th><th>回答什么</th><th>何时读</th></tr>
+        <tr><td><code>PROJECT_OVERVIEW.html</code></td><td>技术现状：页面/数据模型/云函数/存储模式/<strong>技术红线与踩坑</strong>（wx:key、button 样式、onShareAppMessage 同步、跨用户写走云函数等）</td><td><strong>动代码前必读</strong></td></tr>
+        <tr><td><code>GROWTH_ROADMAP.html</code></td><td>执行层：Phase 0-3 任务表、验收指标、当前进度勾选</td><td>领任务时读</td></tr>
+        <tr><td>本档案</td><td>策略层：定位、取舍逻辑、被否方案、算法设计、测试脚本</td><td>做产品判断时读</td></tr>
+        <tr><td>PRD v1.2（~/Downloads/随手做菜_PRD_v1.2.docx）</td><td>正式需求文档（课程/答辩用），与代码状态已对齐</td><td>需要正式文档时读</td></tr>
+      </table>
+
+      <h3>产品一句话</h3>
+      <p>随手做菜是一个 AI 做饭决策助手，核心目标是帮助用户从“不知道今天吃什么”到“顺利吃上饭”。不要把它做成普通菜谱 App 或严肃冰箱库存管理工具。</p>
+
+      <h3>当前主线</h3>
+      <ul>
+        <li>主线：今天吃什么 → 推荐/抽卡 → 查看菜谱 → 加入今日菜单 → 做完扣库存。</li>
+        <li>基础数据：个人菜谱和轻量库存。</li>
+        <li>副线：分享我的菜单，朋友可以点菜。</li>
+        <li>AI 的正确位置：导入菜谱、识别库存、补全步骤、辅助推荐，而不是强行做聊天入口。</li>
+      </ul>
+
+      <h3>不要重复建议的方向</h3>
+      <ul>
+        <li>不要建议把库存放成首页核心。我们已经判断库存是辅助，不是主价值。</li>
+        <li>不要建议优先做营养分析。它不是当前最强痛点。</li>
+        <li>不要建议马上做私厨平台、支付、配送、自取。这是未来商业化，不是当前 MVP。</li>
+        <li>不要建议精确库存系统。产品要允许模糊、近似和低维护。</li>
+        <li>不要建议所有页面堆满功能入口。首页只应该回答用户此刻该做什么。</li>
+      </ul>
+
+      <h3>下一步最应该做</h3>
+      <ol>
+        <li>优化首页 Onboarding，根据菜谱数量和库存状态动态展示主 CTA。</li>
+        <li>完善菜谱导入，让用户快速建立个人菜单。</li>
+        <li>升级推荐规则的<strong>偏好权重</strong>（不重复/临期/搭配已上线，需先有 Phase 0 行为数据）。</li>
+        <li><strike>补齐关键埋点</strike> ✅ 已完成（v1.0.9，见 9.2.1）。</li>
+        <li>做 5-8 个陌生用户任务测试，根据行为而不是口头偏好调整产品。</li>
+      </ol>
+      <p><strong>注意（补充）：</strong>当前卡在验证前夜的两件事都是 <strong>owner 控制台操作</strong>，AI 做不了：① mp 后台配置《用户隐私保护指引》；② 上传体验版并发给体验者。AI 不要因此空转去堆新功能——没数据之前，新功能优先级都低于上面第 5 条。</p>
+
+      <h3>最终判断标准</h3>
+      <p>不要用“功能完成度”判断这个项目，而要用“是否帮用户完成做饭决策”判断。最重要的指标不是库存数量，也不是菜谱数量，而是推荐被接受并最终做成一顿饭的次数。</p>
+    </section>
+  </main>
+</body>
+</html>

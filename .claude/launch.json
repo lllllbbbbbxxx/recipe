@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "h5-demo",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5599", "--directory", "h5-demo"],
+      "port": 5599
+    }
+  ]
+}

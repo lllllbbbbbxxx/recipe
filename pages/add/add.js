@@ -1,8 +1,16 @@
 const dishStore = require('../../utils/dish-store')
 const ingredientClassifier = require('../../utils/ingredient-classifier')
+const track = require('../../utils/track')
 
 const TAGS = ['快手', '清淡', '下饭', '辣', '汤', '家常', '鲜香']
 const MEAL_ROLES = ['荤菜', '素菜', '汤', '主食', '小吃']
+const COMMON_SEASONINGS = ['盐', '生抽', '老抽', '白糖', '糖', '醋', '料酒', '蚝油', '胡椒粉', '淀粉', '食用油', '姜', '蒜', '葱']
+
+// 给食材行生成稳定 key（wx:key 用，避免头部插入/删除时输入框状态串位）
+let ingRowSeq = 0
+function withRowKeys(list) {
+  return (list || []).map(item => item.rowKey ? item : { ...item, rowKey: 'r' + (++ingRowSeq) + '-' + Date.now() })
+}
 const DISH_TEMPLATES = {
   糖醋排骨: {
     mealRole: '荤菜',
@@ -102,6 +110,7 @@ Page({
     customTagName: '',
     tagOptions: TAGS.map(name => ({ name, active: false })),
     ingredients: [{ name: '', amount: '' }],
+    commonSeasonings: COMMON_SEASONINGS,
     autoFillText: '',
     hasUserEditedDetails: false,
     hasManualMealRole: false,
@@ -110,6 +119,8 @@ Page({
   },
 
   onLoad(options) {
+    // 初始数据里的食材行补上稳定 rowKey
+    this.setData({ ingredients: withRowKeys(this.data.ingredients) })
     const saved = dishStore.getCachedDishes()
     const tagNames = [...TAGS]
     saved.forEach(dish => {
@@ -131,7 +142,7 @@ Page({
           coverImage: dish.coverImage || '',
           mealRole: dish.mealRole || '',
           tags,
-          ingredients: dish.ingredients && dish.ingredients.length ? dish.ingredients : [{ name: '', amount: '' }],
+          ingredients: withRowKeys(dish.ingredients && dish.ingredients.length ? dish.ingredients : [{ name: '', amount: '' }]),
           mealRoleOptions: this.buildMealRoleOptions(dish.mealRole || ''),
           tagOptions: this.buildTagOptions(tagNames, tags),
           hasUserEditedDetails: true,
@@ -157,11 +168,23 @@ Page({
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
       success: res => {
         const file = res.tempFiles && res.tempFiles[0]
         if (!file || !file.tempFilePath) return
-        this.saveCoverFile(file.tempFilePath)
+        this.compressAndSaveCover(file.tempFilePath)
       },
+    })
+  },
+
+  // 上传前再压一道：封面只当缩略图，缩到 800px 宽 + 降质量，省空间又加快加载
+  compressAndSaveCover(tempFilePath) {
+    wx.compressImage({
+      src: tempFilePath,
+      quality: 75,
+      compressedWidth: 800,
+      success: res => this.saveCoverFile(res.tempFilePath),
+      fail: () => this.saveCoverFile(tempFilePath),
     })
   },
 
@@ -246,18 +269,37 @@ Page({
   },
 
   addIngredient() {
+    // 新食材加在最上面，食材多时不用下翻
     this.setData({
-      ingredients: [...this.data.ingredients, { name: '', amount: '' }],
+      ingredients: withRowKeys([{ name: '', amount: '' }, ...this.data.ingredients]),
       hasUserEditedDetails: true,
       autoFillText: '',
     })
+  },
+
+  // 点常用调料 chip：已有则提示，没有就加到顶部（默认用量"适量"）
+  quickAddSeasoning(e) {
+    const name = e.currentTarget.dataset.name
+    if (this.data.ingredients.some(i => (i.name || '').trim() === name)) {
+      wx.showToast({ title: `已添加${name}`, icon: 'none' })
+      return
+    }
+    // 若第一行是空行，直接填进去，避免留空行
+    let ingredients
+    const first = this.data.ingredients[0]
+    if (first && !(first.name || '').trim() && !(first.amount || '').trim()) {
+      ingredients = [{ name, amount: '适量' }, ...this.data.ingredients.slice(1)]
+    } else {
+      ingredients = [{ name, amount: '适量' }, ...this.data.ingredients]
+    }
+    this.setData({ ingredients: withRowKeys(ingredients), hasUserEditedDetails: true, autoFillText: '' })
   },
 
   removeIngredient(e) {
     const index = Number(e.currentTarget.dataset.index)
     const ingredients = this.data.ingredients.filter((_, i) => i !== index)
     this.setData({
-      ingredients: ingredients.length ? ingredients : [{ name: '', amount: '' }],
+      ingredients: withRowKeys(ingredients.length ? ingredients : [{ name: '', amount: '' }]),
       hasUserEditedDetails: true,
       autoFillText: '',
     })
@@ -320,6 +362,7 @@ Page({
 
     try {
       await dishStore.saveDish(dish)
+      if (!this.data.isEdit) track.track('dish_add_success', { source: 'manual' })
       wx.hideLoading()
       wx.showToast({ title: this.data.isEdit ? '已修改' : '已保存', icon: 'success' })
       this.backToMenu()
@@ -385,7 +428,7 @@ Page({
       mealRole: template.mealRole || '',
       mealRoleOptions: this.buildMealRoleOptions(template.mealRole || ''),
       tags: template.tags,
-      ingredients: template.ingredients.map(item => ({ ...item })),
+      ingredients: withRowKeys(template.ingredients.map(item => ({ ...item }))),
       tagOptions: this.buildTagOptions(tagNames, template.tags),
       autoFillText: '已根据菜名自动填充食材和标签，可继续修改',
     })

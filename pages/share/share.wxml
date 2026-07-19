@@ -2,30 +2,29 @@
 
   <view wx:if="{{loading}}" class="loading">加载中…</view>
 
-  <view wx:elif="{{submitted}}" class="success-page">
-    <view class="success-icon">✓</view>
-    <view class="success-title">选单已发出！</view>
-    <view class="success-desc">厨师看到后会安排的，坐等开饭吧～</view>
-  </view>
-
   <view wx:elif="{{empty}}" class="loading">找不到菜单，链接可能已过期</view>
 
   <view wx:else>
     <view class="header-card">
-      <view class="header-title">选你想吃的菜</view>
-      <view class="header-desc">点选菜名，选完填下方信息再提交</view>
+      <view class="header-left">
+        <view class="header-title">选你想吃的菜</view>
+        <view class="header-desc">点选菜名，选完填下方信息再提交</view>
+      </view>
+      <view wx:if="{{myOrders.length}}" class="my-orders-entry" bindtap="openMyOrders">
+        我的点单<text class="mo-count">{{myOrders.length}}</text>
+      </view>
     </view>
 
     <view class="dish-list">
       <view
         wx:for="{{dishes}}"
         wx:key="id"
-        class="dish-item {{selectedIds.includes(item.id) ? 'selected' : ''}}"
+        class="dish-item {{item.selected ? 'selected' : ''}}"
         bindtap="toggleDish"
         data-id="{{item.id}}"
       >
-        <view class="dish-check {{selectedIds.includes(item.id) ? 'on' : ''}}">
-          {{selectedIds.includes(item.id) ? '✓' : ''}}
+        <view class="dish-check {{item.selected ? 'on' : ''}}">
+          {{item.selected ? '✓' : ''}}
         </view>
         <view class="dish-info">
           <view class="dish-name">{{item.name}}</view>
@@ -39,14 +38,43 @@
 
     <view class="form-card">
       <view class="form-title">你的信息</view>
-      <input class="form-input" placeholder="你叫什么（必填）" value="{{guestName}}" bindinput="onNameInput" />
+      <view class="identity-row">
+        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image wx:if="{{guestAvatar}}" class="avatar-img" src="{{guestAvatar}}" mode="aspectFill"></image>
+          <view wx:else class="avatar-placeholder">＋<text class="avatar-tip">头像</text></view>
+        </button>
+        <input class="form-input identity-name" type="nickname" placeholder="点这里用微信昵称（必填）" value="{{guestName}}" bindinput="onNameInput" bindblur="onNameInput" />
+      </view>
       <textarea class="form-textarea" placeholder="备注，比如不要辣、人数…（可选）" value="{{note}}" bindinput="onNoteInput" />
       <view class="selected-summary" wx:if="{{selectedIds.length}}">
-        已选 {{selectedIds.length}} 道菜
+        已选 {{selectedIds.length}} 道菜{{editingOrderId ? '（修改中）' : ''}}
       </view>
       <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="submitOrder">
-        {{submitting ? '提交中…' : '提交选单'}}
+        {{submitting ? '提交中…' : (editingOrderId ? '更新点单' : '提交选单')}}
       </view>
+      <view wx:if="{{editingOrderId}}" class="cancel-edit" bindtap="cancelEdit">取消修改</view>
+    </view>
+  </view>
+
+  <!-- 我的点单 弹层 -->
+  <view wx:if="{{showMyOrders}}" class="mo-mask" bindtap="closeMyOrders">
+    <view class="mo-sheet" catchtap>
+      <view class="mo-sheet-head">
+        <view class="mo-sheet-title">我的点单</view>
+        <view class="mo-sheet-close" bindtap="closeMyOrders">✕</view>
+      </view>
+      <scroll-view class="mo-scroll" scroll-y>
+        <view wx:for="{{myOrders}}" wx:key="id" class="my-order">
+          <view class="my-order-main">
+            <view class="my-order-dishes">{{item.dishNames}}</view>
+            <view class="my-order-meta">{{item.timeText}}{{item.status === 'done' ? ' · 已完成' : ' · 待处理'}}{{item.note ? ' · ' + item.note : ''}}</view>
+          </view>
+          <view class="my-order-actions">
+            <view wx:if="{{item.editable}}" class="mo-edit" bindtap="editOrder" data-id="{{item.id}}">修改</view>
+            <view class="mo-del" bindtap="deleteOrder" data-id="{{item.id}}">删除</view>
+          </view>
+        </view>
+      </scroll-view>
     </view>
   </view>
 

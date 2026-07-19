@@ -6,7 +6,8 @@
     "pages/draw/draw",
     "pages/backup/backup",
     "pages/share/share",
-    "pages/orders/orders"
+    "pages/orders/orders",
+    "pages/shares/shares"
   ],
   "window": {
     "navigationBarTitleText": "今天吃什么",

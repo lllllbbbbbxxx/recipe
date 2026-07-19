@@ -1,6 +1,7 @@
 const dishStore = require('../../utils/dish-store')
 const fridgeStore = require('../../utils/fridge-store')
 const matchUtils = require('../../utils/match-utils')
+const track = require('../../utils/track')
 
 Page({
   data: {
@@ -30,6 +31,7 @@ Page({
   },
 
   onShow() {
+    track.track('page_view', { page: 'draw' })
     this.loadData()
   },
 
@@ -61,12 +63,23 @@ Page({
     }
   },
 
+  // 读今日菜单里已有的类别（供"荤素搭配"加权）
+  getCartRoles() {
+    const pages = getCurrentPages()
+    const menuPage = pages.find(p => p.route === 'pages/menu/menu')
+    if (!menuPage) return []
+    return (menuPage.data.cart || []).map(d => d.mealRole).filter(Boolean)
+  },
+
   startDraw() {
     if (!this.data.candidates.length) {
       wx.showToast({ title: '先添加菜谱', icon: 'none' })
       return
     }
     if (this.data.isDrawing) return
+
+    // 已有结果再点 = 再抽（隐式拒绝上一张）
+    track.track(this.data.hasResult ? 'recommend_redraw' : 'draw_click', { type: 'draw' })
 
     this.setData({
       isDrawing: true,
@@ -82,10 +95,13 @@ Page({
       count += 1
       if (count >= 16) {
         clearInterval(timer)
-        const picked = matchUtils.pickWeightedDish(this.data.candidates, this.data.fridgeItems)
+        const picked = matchUtils.pickWeightedDish(this.data.candidates, this.data.fridgeItems, { cartRoles: this.getCartRoles() })
         const dish = picked ? picked.dish : this.data.candidates[Math.floor(Math.random() * this.data.candidates.length)]
+        const card = this.buildCardDish(dish)
+        const matchMap = { 'match-ready': 'ready', 'match-almost': 'almost', 'match-missing': 'miss' }
+        track.track('recommend_view', { type: 'draw', dishId: String(dish.id), match: matchMap[card.matchClass] || 'miss' })
         this.setData({
-          currentDish: this.buildCardDish(dish),
+          currentDish: card,
           isDrawing: false,
           hasResult: true,
           resultLabel: 'TONIGHT',
@@ -97,6 +113,7 @@ Page({
 
   addToMenu() {
     if (!this.data.hasResult) return
+    track.track('recommend_accept', { type: 'draw', dishId: String(this.data.currentDish.id) })
     const pages = getCurrentPages()
     const prevPage = pages.length > 1 ? pages[pages.length - 2] : null
     if (prevPage && prevPage.route === 'pages/menu/menu') {

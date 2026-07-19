@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>随手做菜 · 初创发展规划与迭代指引（AI 协作文档）</title>
+  <style>
+    :root {
+      --green: #1D9E75; --green-light: #e8f7f1; --green-mid: #0f8b63;
+      --red: #E5534B; --orange: #f07f3a; --blue: #3a7fb5; --purple: #7c5cbf;
+      --gray: #666; --gray-light: #f5f5f5; --border: #e0e0e0; --text: #222;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; color: var(--text); background: #fafafa; line-height: 1.7; }
+    header { background: linear-gradient(135deg, #0f8b63, #1D9E75); color: white; padding: 36px 48px 28px; }
+    header h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p { margin-top: 6px; opacity: 0.88; font-size: 0.95rem; max-width: 760px; }
+    .meta { margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.22); border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; }
+    main { max-width: 940px; margin: 0 auto; padding: 40px 24px 80px; }
+    h2 { font-size: 1.35rem; font-weight: 700; margin: 44px 0 16px; border-left: 4px solid var(--green); padding-left: 12px; }
+    h3 { font-size: 1.05rem; font-weight: 600; margin: 24px 0 10px; color: var(--green-mid); }
+    p { margin-bottom: 10px; color: #333; font-size: 0.95rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 10px 0 18px; background: white; }
+    th { background: var(--gray-light); text-align: left; padding: 8px 12px; font-weight: 600; color: #444; border-bottom: 2px solid var(--border); }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #444; vertical-align: top; }
+    td code, p code, li code { background: var(--gray-light); border-radius: 4px; padding: 1px 5px; font-size: 0.83rem; font-family: monospace; color: var(--green-mid); }
+    tr:last-child td { border-bottom: none; }
+    ul { margin: 6px 0 14px 20px; font-size: 0.92rem; color: #444; }
+    li { margin-bottom: 5px; }
+    .phase { background: white; border: 1px solid var(--border); border-radius: 12px; margin: 18px 0; overflow: hidden; }
+    .phase-head { padding: 16px 22px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .phase-num { min-width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
+    .p0 { background: var(--red); } .p1 { background: var(--orange); } .p2 { background: var(--blue); } .p3 { background: var(--purple); }
+    .phase-title { font-size: 1.08rem; font-weight: 700; }
+    .phase-goal { font-size: 0.85rem; color: var(--gray); margin-left: auto; text-align: right; }
+    .phase-body { padding: 16px 22px 8px; }
+    .warn { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; color: #b91c1c; margin: 12px 0; }
+    .info { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; color: #1e40af; margin: 12px 0; }
+    .ok { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; color: #166534; margin: 12px 0; }
+    .pill { display: inline-block; border-radius: 10px; padding: 0 8px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; }
+    .pill-s { background: #e8f7f1; color: var(--green-mid); } .pill-m { background: #fef3e2; color: var(--orange); } .pill-l { background: #fde8e7; color: var(--red); }
+    footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: #999; font-size: 0.83rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>随手做菜 · 初创发展规划与迭代指引</h1>
+  <p>本文档回答"下一步做什么、为什么、做到什么程度算成"。给 AI 协作者的分工：<strong>PROJECT_OVERVIEW.html 讲现状与技术约定（先读它），本文档讲执行计划，JunCook_Product_Archive.html 讲产品定位与取舍逻辑（做产品判断时读）</strong>。三份文档随代码一起维护；版本对照见档案第 10 章。</p>
+  <div class="meta">
+    <span class="badge">基线版本：v1.0.9</span>
+    <span class="badge">文档：2026-07-12</span>
+    <span class="badge">配套 PRD：随手做菜_PRD_v1.2.docx</span>
+    <span class="badge">阶段：验证前夜（0 真实数据）</span>
+  </div>
+</header>
+
+<main>
+
+  <h2>〇、一页结论</h2>
+  <div class="ok"><strong>产品功能已超前于验证。</strong>核心闭环（录入→推荐→做饭→扣减→再推荐）和社交链路（分享→点单→接单）都已建成，但所有产品假设仍是零数据状态。<strong>当前最高优先级不是新功能,而是把体验版交到 10–15 个真实用户手里，让埋点跑出第一批数据。</strong>后续每个 Phase 都由数据门槛决定是否推进。</div>
+  <p><strong>北极星指标：每周通过产品完成的做饭决策次数</strong>（埋点 <code>meal_decided</code> / <code>meal_cooked</code>）。所有迭代最终服务于它。</p>
+
+  <h2>一、现状快照（v1.0.9 已具备）</h2>
+  <ul>
+    <li><strong>决策</strong>：库存匹配 + 加权抽卡（临期优先/荤素搭配/48h 不重复）、生成菜单、今日菜单食材汇总</li>
+    <li><strong>库存</strong>：手动/OCR/引导三种入库、qty+unit 数量模型、做完菜按量扣减、临期提醒</li>
+    <li><strong>社交</strong>：勾选式分享快照、分享记录、好友点单（改/删）、点单中心双 tab、头像昵称</li>
+    <li><strong>数据</strong>：13 类事件埋点（含 appVersion）+ analytics 云函数（7 问题指标）</li>
+    <li><strong>事实约束</strong>：单人 + AI 开发；体验者池 10–15 人；已微信认证未备案；未正式发布；零真实使用数据</li>
+  </ul>
+
+  <h2>二、缺口分析（初创六维）</h2>
+  <table>
+    <tr><th style="width:110px">维度</th><th>缺口</th><th style="width:90px">severity</th></tr>
+    <tr><td><strong>验证</strong></td><td>三大核心假设（愿维护库存 / 推荐有价值 / 分享能裂变）全部零数据；PRD 6.x 实验从未执行</td><td>🔴 致命</td></tr>
+    <tr><td><strong>数据</strong></td><td>① <code>share</code>/<code>orders</code> 页面<strong>没有任何埋点</strong>——裂变漏斗（分享→打开→下单→转化）中间全断；② analytics 无时间窗口，7日留存/周活口径算不出</td><td>🔴 高</td></tr>
+    <tr><td><strong>产品</strong></td><td>① 无留存钩子：临期提醒只在打开 app 时可见，用户不打开就永远想不起来（需微信订阅消息）；② 无做法步骤：决定"照着做"场景是否成立（PRD 有 steps 字段，产品未做）；③ P1 偏好权重未做；④ 首次使用未串成 onboarding 流程（导入/引导是散点）</td><td>🟠 高</td></tr>
+    <tr><td><strong>增长</strong></td><td>被分享者（好友）下单完就走了——<strong>下单成功后没有"我也要建自己的菜单"转化钩子</strong>，唯一的裂变环路是断的；无分享卡片图/小程序码物料</td><td>🟠 中高</td></tr>
+    <tr><td><strong>工程/运维</strong></td><td>无自动化测试；云存储垃圾累积（ocr-tmp/、order-avatars/ 无清理）；orders 建单无限频（垃圾单风险）；无错误监控告警</td><td>🟡 中</td></tr>
+    <tr><td><strong>合规</strong></td><td>① 埋点收集 openid+行为数据、好友上传头像昵称——<strong>《用户隐私保护指引》未在 mp 后台配置，正式发布审核会被卡</strong>；② 用户上传头像未接内容安全检测（<code>security.imgSecCheck</code>）</td><td>🔴 发布前必须</td></tr>
+  </table>
+
+  <h2>三、指标体系（AI 实现时以此为准）</h2>
+  <table>
+    <tr><th>层级</th><th>指标</th><th>定义/口径</th><th>现状</th></tr>
+    <tr><td>北极星</td><td>周决策次数</td><td>周内 <code>meal_decided</code> 会话数（去重），辅以 <code>meal_cooked</code>（真做了）</td><td>✅ 事件已有，缺周聚合</td></tr>
+    <tr><td>激活</td><td>首日激活率</td><td>首次打开当天完成任一关键动作（<code>first_action</code> 存在）</td><td>✅ 可算</td></tr>
+    <tr><td>留存</td><td>7 日留存</td><td>首开后第 7 天（±1）仍有 <code>app_open</code></td><td>❌ 需 analytics 加时间窗口</td></tr>
+    <tr><td>参与</td><td>库存维护率</td><td>7 天内有 <code>fridge_add</code>/<code>fridge_qty_edit</code>/<code>meal_cooked</code> 的用户占比</td><td>◑ 部分可算</td></tr>
+    <tr><td>推荐质量</td><td>抽卡接受率(按匹配度)</td><td><code>recommend_accept / recommend_view</code>，分 ready/almost/miss</td><td>✅ 可算</td></tr>
+    <tr><td>裂变</td><td>分享转化漏斗</td><td><code>menu_share</code> → <code>share_open</code>(缺) → <code>order_submit</code>(缺) → 被分享者 7 日内成为建库用户(缺)</td><td>❌ share/orders 页需补埋点</td></tr>
+  </table>
+  <div class="info"><strong>给 AI 的埋点补齐清单</strong>（Phase 0 任务）：share.js 加 <code>share_open</code>{menuId, hasOrdered}、<code>order_submit</code>{menuId, dishCount}、<code>order_edit</code>/<code>order_delete</code>；orders.js 加 <code>page_view</code>{page:'orders', tab}、<code>order_accept_to_menu</code>、<code>order_mark_done</code>。全部走 <code>utils/track.js</code>，一行一个,静默失败。</div>
+
+  <h2>四、迭代路线图</h2>
+  <p>门槛制推进：<strong>每个 Phase 有进入条件和验收指标,不达标不进入下一阶段</strong>（宁可回头改,不往前堆）。工作量标注：<span class="pill pill-s">S≤半天</span><span class="pill pill-m">M≤2天</span><span class="pill pill-l">L≤1周</span></p>
+
+  <div class="phase">
+    <div class="phase-head"><div class="phase-num p0">0</div><div class="phase-title">验证冲刺</div><div class="phase-goal">目标：拿到第一批真实数据<br>时长：~2 周</div></div>
+    <div class="phase-body">
+      <table>
+        <tr><th style="width:36px">#</th><th>任务</th><th>为什么</th><th>验收</th><th style="width:56px">量</th></tr>
+        <tr><td>0.1</td><td>✅ <strike>补 share/orders 页埋点（上表清单）</strike> 已完成</td><td>裂变漏斗现在是断的,发出去也测不到</td><td>6 个新事件入库可查</td><td><span class="pill pill-s">S</span></td></tr>
+        <tr><td>0.2</td><td>✅ <strike>analytics 加时间窗口</strike> 已完成（留存/周活/漏斗/按天 + days 参数）</td><td>PRD 5.1 两个核心指标现在算不出</td><td>云端测试返回留存/周活数字</td><td><span class="pill pill-m">M</span></td></tr>
+        <tr><td>0.3</td><td>mp 后台配置《用户隐私保护指引》（收集：openid、头像昵称、使用日志）</td><td>不配审核过不了,埋点即违规</td><td>后台生效</td><td><span class="pill pill-s">S</span>（owner 操作）</td></tr>
+        <tr><td>0.4</td><td>发布体验版给 10–15 体验者，附 3 个任务（建菜谱库→OCR 入库→做一顿并扣减）+ 微信群收集反馈</td><td>一切假设的数据来源</td><td>≥10 人完成任务链,≥3 天活跃</td><td><span class="pill pill-s">S</span>（owner 操作）</td></tr>
+        <tr><td>0.5</td><td>执行 PRD 6.2 OCR 实验 + 6.3 推荐验证,访谈 5 人</td><td>PRD 写了从没跑</td><td>两个实验有结论(过/不过/改)</td><td><span class="pill pill-m">M</span>（owner 主导）</td></tr>
+      </table>
+      <p><strong>不做</strong>：任何新功能。<strong>Phase 0 出口判定</strong>：跑出首批指标后,对照 PRD 目标（7留≥40%、周决策≥3、库存维护率≥50%、OCR 使用≥60%）决定 Phase 1 的侧重。</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><div class="phase-num p1">1</div><div class="phase-title">留存与闭环打磨</div><div class="phase-goal">目标：7日留存 ≥ 40%<br>时长：~4 周</div></div>
+    <div class="phase-body">
+      <table>
+        <tr><th style="width:36px">#</th><th>任务</th><th>为什么</th><th>验收</th><th style="width:56px">量</th></tr>
+        <tr><td>1.1</td><td><strong>微信订阅消息</strong>：临期提醒（"番茄还剩2天"）+ 接单通知（有人点你的菜）。做完菜/加库存时请求订阅授权</td><td>唯一合规的召回通道；没有它用户不会想起产品——留存的第一杠杆</td><td>订阅率≥50%,提醒点开→打开 app 转化≥20%</td><td><span class="pill pill-l">L</span></td></tr>
+        <tr><td>1.2</td><td><strong>做法步骤</strong>：菜谱加 steps 字段+详情展示；用 AI（云函数调 LLM）按"菜名+食材"生成步骤初稿,用户可改</td><td>补全"决定之后照着做"的断点；也是 AI 差异化能力</td><td>≥60% 新菜谱有步骤;详情页停留可观测</td><td><span class="pill pill-l">L</span></td></tr>
+        <tr><td>1.3</td><td><strong>P1 偏好权重</strong>：抽卡池加"接受/换掉"历史权重（accept +、redraw −）+ 标签偏好统计</td><td>推荐接受率是价值证明;有 recommend_* 数据后才做得对</td><td>接受率相比 Phase 0 基线提升≥10pp</td><td><span class="pill pill-m">M</span></td></tr>
+        <tr><td>1.4</td><td><strong>Onboarding 串联</strong>：首次打开 → 一键导入家常菜 → 一键常备库存 → 抽第一张卡,三步引导</td><td>冷启动组件都有,但用户要自己找;串成流程降低首日流失</td><td>新用户首日激活率≥70%</td><td><span class="pill pill-m">M</span></td></tr>
+        <tr><td>1.5</td><td>◑ 运维补课（<strong>大部分已提前完成</strong>：OCR 临时图即用即删、建单限频 10/人/时、删单清头像）；剩余：错误监控告警</td><td>成本与垃圾数据在用户增长前堵住</td><td>存储不再线性增长</td><td><span class="pill pill-m">M</span></td></tr>
+      </table>
+      <p><strong>不做</strong>：商业化、家庭共享、情绪推荐。</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><div class="phase-num p2">2</div><div class="phase-title">增长（裂变环路闭合）</div><div class="phase-goal">目标：被分享者→新用户转化 ≥ 15%<br>时长：~4 周</div></div>
+    <div class="phase-body">
+      <table>
+        <tr><th style="width:36px">#</th><th>任务</th><th>为什么</th><th>验收</th><th style="width:56px">量</th></tr>
+        <tr><td>2.1</td><td><strong>被分享者转化钩子</strong>：好友下单成功页加"我也要建自己的菜单"CTA → 直达 onboarding（一键导入）</td><td>现在好友用完即走,裂变环路的最后一环是断的——最便宜的增长</td><td>下单成功→建库转化≥15%</td><td><span class="pill pill-s">S</span></td></tr>
+        <tr><td>2.2</td><td>分享物料：自动生成分享卡片图（菜单标题+菜名+小程序码）,支持保存/发朋友圈</td><td>转发消息只触达单聊;卡片图打开率更高且可进朋友圈</td><td>卡片分享占比、打开率可测</td><td><span class="pill pill-m">M</span></td></tr>
+        <tr><td>2.3</td><td>正式发布上线（提审）+ 备案（如需）</td><td>体验版有 100 人上限且需加成员;增长必须过审</td><td>线上版可被任意用户打开</td><td><span class="pill pill-s">S</span>（owner）</td></tr>
+        <tr><td>2.4</td><td>实验：家庭共享库存 MVP（一个"家庭码"把 2 人库存合并只读）</td><td>V2.0 里最贴核心场景的一项,先小做验证需求</td><td>≥20% 活跃用户尝试则立项完整版</td><td><span class="pill pill-l">L</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><div class="phase-num p3">3</div><div class="phase-title">商业化探索（仅当留存达标）</div><div class="phase-goal">进入条件：7留≥40% 且 周决策≥3 稳定 4 周<br>时长：8 周+</div></div>
+    <div class="phase-body">
+      <table>
+        <tr><th>路径</th><th>形态</th><th>判断</th></tr>
+        <tr><td><strong>会员订阅</strong>（首选验证）</td><td>AI 生成菜谱/步骤配额、高级推荐（偏好+营养）、家庭共享多人</td><td>与核心价值同向;先做 1 元档意愿测试</td></tr>
+        <tr><td><strong>采购佣金</strong></td><td>缺料清单一键跳美团/京东到家（联盟链接）</td><td>体验加分,佣金薄;作为补充</td></tr>
+        <tr><td><strong>广告</strong></td><td>激励视频/banner</td><td>早期伤体验,<strong>不做</strong>,DAU&gt;5k 再议</td></tr>
+      </table>
+      <p><strong>决策标准</strong>：任一路径需先用假门测试（fake door）验证意愿 ≥8%,再投入开发。</p>
+    </div>
+  </div>
+
+  <h2>五、给 AI 协作者的执行指引</h2>
+  <h3>开工流程（每次会话）</h3>
+  <ul>
+    <li>① 读 <code>PROJECT_OVERVIEW.html</code>（现状/数据模型/技术坑,尤其第九章注意事项）→ ② 读本文档定位当前 Phase → ③ 从当前 Phase 的任务表按序领任务,不跨 Phase 拿活</li>
+    <li>每个任务的完成定义 = <strong>代码 + 对应埋点 + 可测的验收指标</strong>,三者缺一不算完</li>
+    <li>收尾四件套：更新 PROJECT_OVERVIEW（现状/更新历史）→ 若方向有变更新本文档 → bump <code>utils/track.js</code> 的 <code>APP_VERSION</code> → git commit（不 push,owner 决定）</li>
+  </ul>
+  <h3>技术红线（详见 OVERVIEW,此处只列禁改项）</h3>
+  <ul>
+    <li>不改"本地即时写入 + 云端后台同步"的存储模式;不改冰箱按 name 去重语义</li>
+    <li>订单的写操作（改状态/删除）只能走 <code>orderAction</code> 云函数,不得回退为客户端直写</li>
+    <li>埋点必须静默失败（不 await、不 toast）,禁止阻塞任何用户操作</li>
+    <li>新增列表渲染一律用稳定 wx:key（禁 <code>wx:key="index"</code>）;WXML 绑定里禁方法调用</li>
+  </ul>
+  <h3>需要 owner 决策的事（AI 不得自作主张）</h3>
+  <ul>
+    <li>任何收费/价格、隐私政策文案、删除用户数据、对外发布提审、新增第三方 SDK/域名</li>
+  </ul>
+
+  <h2>六、风险与止损线</h2>
+  <table>
+    <tr><th>风险</th><th>信号</th><th>止损动作</th></tr>
+    <tr><td>用户不愿维护库存（PRD 最大风险）</td><td>Phase 1 结束库存维护率 &lt; 30%,或"做完菜扣库存率" &lt; 20%</td><td><strong>转向"无库存轻量版"</strong>：砍库存模块为可选,主打"抽卡决策 + 分享点单",重写定位</td></tr>
+    <tr><td>推荐无感知价值</td><td>ready 与 miss 的接受率差 &lt; 5pp</td><td>停 P1 投入,推荐退化为"快手优先"简单规则,资源转社交链路</td></tr>
+    <tr><td>裂变环不转</td><td>2.1 上线后被分享者转化 &lt; 5%</td><td>放弃增长依赖裂变的假设,转内容渠道（小红书菜谱内容引流）</td></tr>
+    <tr><td>合规卡审</td><td>提审被拒</td><td>隐私指引/类目/内容安全逐项过;头像接 imgSecCheck</td></tr>
+  </table>
+
+  <h2>七、本周就做（P0 checklist）</h2>
+  <ul>
+    <li>☑ 0.1 补 share/orders 埋点 —— 已完成</li>
+    <li>☑ 0.2 analytics 时间窗口 + 留存口径 —— 已完成（记得重新部署 analytics）</li>
+    <li>☐ 0.3 mp 后台配置隐私保护指引（owner）</li>
+    <li>☐ 0.4 体验版发布 + 拉体验者群 + 发任务链（owner）</li>
+    <li>☐ 0.5 两周后跑 analytics,对照 PRD 目标出 Phase 0 结论（AI 出报告 + owner 判断）</li>
+  </ul>
+
+</main>
+
+<footer>随手做菜 · 发展规划 v1.0（基线 v1.0.9）· 2026-07-12 —— 现状看 PROJECT_OVERVIEW.html,方向看本文档;每完成一个 Phase 请更新"当前阶段"徽章与任务勾选。</footer>
+
+</body>
+</html>

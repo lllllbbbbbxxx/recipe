@@ -2,6 +2,10 @@ const dishStore = require('../../utils/dish-store')
 const fridgeStore = require('../../utils/fridge-store')
 const matchUtils = require('../../utils/match-utils')
 const freshnessUtils = require('../../utils/freshness-utils')
+const { PRESET_DISHES } = require('../../utils/preset-dishes')
+const track = require('../../utils/track')
+const shareStore = require('../../utils/share-store')
+const amountUtils = require('../../utils/amount-utils')
 
 const TAGS = ['快手', '清淡', '下饭', '辣', '汤', '家常', '鲜香']
 const MEAL_ROLES = ['可做', '荤菜', '素菜', '汤', '主食', '小吃']
@@ -26,6 +30,15 @@ Page({
     openedDishId: '',
     touchStartX: 0,
     touchStartY: 0,
+    showImportEntry: false,
+    showDishGuide: false,
+    dishGuideItems: [],
+    showShareSheet: false,
+    shareDishItems: [],
+    shareAllOn: true,
+    shareSelectedCount: 0,
+    showConsume: false,
+    consumeItems: [],
     fridgeReminderText: '',
     urgentFridgeNames: [],
   },
@@ -35,6 +48,7 @@ Page({
   },
 
   onShow() {
+    track.track('page_view', { page: 'menu' })
     this.loadDishes()
   },
 
@@ -115,7 +129,52 @@ Page({
       filteredDishes: result,
       categoryFilters: this.buildCategoryFilters(dishes, activeFilters),
       isDishListEmpty: result.length === 0,
+      showImportEntry: dishes.length < 10,   // 菜谱少于 10 道时露出一键导入入口
     })
+  },
+
+  openDishGuide() {
+    this.closeSwipe()
+    const existing = new Set(this.data.dishes.map(d => d.name))
+    const dishGuideItems = PRESET_DISHES.map(d => ({
+      name: d.name,
+      mealRole: d.mealRole,
+      ingredientText: d.ingredients.map(i => i.name).slice(0, 4).join('、'),
+      exists: existing.has(d.name),      // 已有的置灰不选
+      selected: !existing.has(d.name),   // 未有的默认勾选
+    }))
+    this.setData({ showDishGuide: true, dishGuideItems })
+  },
+
+  closeDishGuide() {
+    this.setData({ showDishGuide: false })
+  },
+
+  toggleDishGuideItem(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const dishGuideItems = this.data.dishGuideItems.map((item, i) =>
+      (i === index && !item.exists) ? { ...item, selected: !item.selected } : item
+    )
+    this.setData({ dishGuideItems })
+  },
+
+  importDishes() {
+    const picked = this.data.dishGuideItems.filter(item => item.selected && !item.exists)
+    if (!picked.length) {
+      wx.showToast({ title: '没有可导入的新菜', icon: 'none' })
+      return
+    }
+    const byName = {}
+    PRESET_DISHES.forEach(d => { byName[d.name] = d })
+    const toAdd = picked.map(item => {
+      const d = byName[item.name]
+      return { id: 'd-' + d.name, name: d.name, mealRole: d.mealRole, tags: d.tags, ingredients: d.ingredients, coverImage: '' }
+    })
+    // 本地即时写入，云端后台同步
+    const dishes = dishStore.saveDishesBatch(toAdd)
+    track.track('dish_import_done', { count: toAdd.length })
+    this.setData({ showDishGuide: false, dishes: this.normalizeDishes(dishes) }, () => this.applyFilter())
+    wx.showToast({ title: `已导入 ${toAdd.length} 道菜`, icon: 'success' })
   },
 
   toggleCart(e) {
@@ -171,6 +230,8 @@ Page({
       picked.push(rest[Math.floor(Math.random() * rest.length)])
     }
 
+    track.track('generate_menu', { count: picked.length })
+    track.track('recommend_view', { type: 'generate', count: picked.length })
     const cart = this.mergeCartDishes(picked)
     this.setData({
       ...this.buildCartData(cart),
@@ -241,7 +302,123 @@ Page({
   },
 
   toggleCartPanel() {
+    if (!this.data.showCart && this.data.cart.length) {
+      track.track('meal_decided', { dishCount: this.data.cart.length })
+    }
     this.setData({ showCart: !this.data.showCart, openedDishId: '' }, () => this.applyFilter())
+  },
+
+  // 从今日菜单的菜谱里，累加"这个食材、且单位一致"的用量；对不上返回 0
+  recipeUsedForItem(name, unit) {
+    let total = 0
+    let found = false
+    this.data.cart.forEach(dish => (dish.ingredients || []).forEach(ing => {
+      const iname = String(ing.name || '').trim()
+      if (!iname || !(iname.includes(name) || name.includes(iname))) return
+      const p = amountUtils.parseAmount(ing.amount || '')
+      if (p.qty && p.unit === unit) { total += parseFloat(p.qty) || 0; found = true }
+    }))
+    return found ? total : 0
+  },
+
+  // ── P0：做完菜 → 按量扣减库存 ──
+  openConsume() {
+    const ingNames = []
+    this.data.cart.forEach(dish => (dish.ingredients || []).forEach(i => {
+      const n = String(i.name || '').trim()
+      if (n) ingNames.push(n)
+    }))
+    const seen = {}
+    const consumeItems = []
+    ;(this.data.fridgeItems || []).forEach(item => {
+      if (item.staple) return
+      const name = String(item.name || '').trim()
+      const used = ingNames.some(ing => ing.includes(name) || name.includes(ing))
+      if (!used || seen[item.id]) return
+      seen[item.id] = true
+      const qtyNum = parseFloat(item.qty) || 0
+      let type = amountUtils.unitType(item.unit)
+      // 填了数量但没填单位 → 按计数处理，仍可扣减
+      if (type === 'none' && qtyNum > 0) type = 'count'
+      const recipeUsed = this.recipeUsedForItem(name, item.unit || '')  // 菜谱里的用量（单位一致才有值）
+      consumeItems.push({
+        id: item.id, name, unit: item.unit || '', qtyNum, type,
+        amountText: item.amount || '',
+        // 计数：菜谱用量优先，对不上默认 1
+        usedQty: type === 'count' ? String(recipeUsed > 0 ? recipeUsed : 1) : '',
+        // 重量：菜谱有对得上的量就预填自定义，否则默认"用了一半"
+        mode: type === 'weight' ? (recipeUsed > 0 ? 'custom' : 'half') : 'none',
+        customQty: (type === 'weight' && recipeUsed > 0) ? String(recipeUsed) : '',
+      })
+    })
+    this.setData({ showConsume: true, consumeItems })
+  },
+
+  closeConsume() {
+    this.setData({ showConsume: false })
+  },
+
+  onConsumeUsed(e) {
+    const i = Number(e.currentTarget.dataset.index)
+    const v = e.detail.value
+    this.setData({ consumeItems: this.data.consumeItems.map((it, idx) => idx === i ? { ...it, usedQty: v } : it) })
+  },
+
+  setConsumeMode(e) {
+    const i = Number(e.currentTarget.dataset.index)
+    const mode = e.currentTarget.dataset.mode
+    this.setData({ consumeItems: this.data.consumeItems.map((it, idx) => idx === i ? { ...it, mode } : it) })
+  },
+
+  onConsumeCustom(e) {
+    const i = Number(e.currentTarget.dataset.index)
+    const v = e.detail.value
+    this.setData({ consumeItems: this.data.consumeItems.map((it, idx) => idx === i ? { ...it, customQty: v, mode: 'custom' } : it) })
+  },
+
+  confirmConsume() {
+    const ops = []
+    this.data.consumeItems.forEach(it => {
+      if (it.type === 'count') {
+        const used = parseFloat(it.usedQty) || 0
+        if (used <= 0) return
+        const remain = it.qtyNum - used
+        if (!it.qtyNum || remain <= 0) ops.push({ id: it.id, remove: true })
+        else ops.push({ id: it.id, qty: String(remain), unit: it.unit })
+      } else if (it.type === 'weight') {
+        if (it.mode === 'none') return
+        if (it.mode === 'all') { ops.push({ id: it.id, remove: true }); return }
+        if (!it.qtyNum && it.mode !== 'custom') { ops.push({ id: it.id, remove: true }); return }
+        let remain = null
+        if (it.mode === 'half') remain = it.qtyNum / 2
+        else if (it.mode === 'quarter') remain = it.qtyNum * 0.75
+        else if (it.mode === 'custom') {
+          const used = parseFloat(it.customQty) || 0
+          if (used <= 0) return
+          remain = it.qtyNum - used
+        }
+        if (remain == null) return
+        remain = Math.round(remain * 100) / 100
+        if (remain <= 0) ops.push({ id: it.id, remove: true })
+        else ops.push({ id: it.id, qty: String(remain), unit: it.unit })
+      }
+      // vague / none：适量或没填量 → 不扣
+    })
+    if (ops.length) {
+      const fridgeItems = fridgeStore.applyConsumption(ops)
+      this.setData({ fridgeItems, ...this.buildFridgeReminderData(fridgeItems) })
+    }
+    // 给做过的菜写 lastCooked，供抽卡"不重复推荐"降权
+    const cookedIds = this.data.cart.map(d => String(d.id))
+    const dishes = dishStore.markCooked(cookedIds)
+    track.track('meal_cooked', { dishCount: cookedIds.length, consumed: ops.length })
+    this.setData({
+      showConsume: false,
+      showCart: false,
+      dishes: this.normalizeDishes(dishes),
+      ...this.buildCartData([]),
+    }, () => this.applyFilter())
+    wx.showToast({ title: ops.length ? `已扣减 ${ops.length} 样食材` : '已完成', icon: 'success' })
   },
 
   removeFromCart(e) {
@@ -297,17 +474,99 @@ Page({
     wx.navigateTo({ url: '/pages/orders/orders' })
   },
 
+  // 打开"选择要分享的菜"面板（默认全选）
+  openShareSheet() {
+    this.closeSwipe()
+    const app = getApp()
+    if (!app.globalData.openid) app.fetchOpenid && app.fetchOpenid()
+    const shareDishItems = this.data.dishes.map(d => ({
+      id: String(d.id),
+      name: d.name,
+      mealRole: d.mealRole || '',
+      selected: true,
+    }))
+    this.setData({
+      showShareSheet: true,
+      shareDishItems,
+      shareAllOn: true,
+      shareSelectedCount: shareDishItems.length,
+    })
+  },
+
+  closeShareSheet() {
+    this.setData({ showShareSheet: false })
+  },
+
+  toggleShareDish(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const shareDishItems = this.data.shareDishItems.map((it, i) =>
+      i === index ? { ...it, selected: !it.selected } : it
+    )
+    this.setData({
+      shareDishItems,
+      shareAllOn: shareDishItems.every(it => it.selected),
+      shareSelectedCount: shareDishItems.filter(it => it.selected).length,
+    })
+  },
+
+  toggleShareAll() {
+    const next = !this.data.shareAllOn
+    const shareDishItems = this.data.shareDishItems.map(it => ({ ...it, selected: next }))
+    this.setData({
+      shareDishItems,
+      shareAllOn: next,
+      shareSelectedCount: next ? shareDishItems.length : 0,
+    })
+  },
+
+  shareNoneTip() {
+    wx.showToast({ title: '先勾选要分享的菜', icon: 'none' })
+  },
+
+  // 点"分享给朋友"（按钮 open-type=share）：同步生成 menuId + 后台建快照
+  prepareShare() {
+    const app = getApp()
+    const openid = app.globalData.openid || ''
+    const picked = this.data.shareDishItems.filter(it => it.selected)
+    if (!openid || !picked.length) {
+      this._shareMenuId = ''   // 兜底：回退到分享全部菜谱
+      wx.showToast({ title: !openid ? '正在获取身份，请稍后重试' : '先勾选要分享的菜', icon: 'none' })
+      return
+    }
+    const byId = {}
+    this.data.dishes.forEach(d => { byId[String(d.id)] = d })
+    const dishes = picked.map(it => {
+      const d = byId[it.id] || {}
+      return {
+        id: String(it.id),
+        name: d.name || it.name,
+        mealRole: d.mealRole || '',
+        tags: d.tags || [],
+        ingredients: d.ingredients || [],
+        coverImage: d.coverImage || '',
+      }
+    })
+    const key = shareStore.genKey(openid)
+    this._shareMenuId = key
+    shareStore.createSharedMenu(key, openid, dishes)
+    track.track('menu_share', { count: dishes.length })
+    this.setData({ showShareSheet: false })
+  },
+
+  goShares() {
+    this.closeShareSheet()
+    wx.navigateTo({ url: '/pages/shares/shares' })
+  },
+
   onShareAppMessage() {
     const app = getApp()
     const openid = app.globalData.openid || ''
-    if (!openid) {
-      // 身份还没拿到，后台再补一次，避免分享链接缺 chefId
-      app.fetchOpenid && app.fetchOpenid()
-    }
-    return {
-      title: '来看看我会做什么菜，帮我选几道！',
-      path: `/pages/share/share?chefId=${openid}`,
-    }
+    const menuId = this._shareMenuId || ''
+    this._shareMenuId = ''   // 快照 id 用后即焚：右上角系统转发回退到全量，不带旧快照
+    const path = menuId
+      ? `/pages/share/share?menuId=${menuId}`
+      : `/pages/share/share?chefId=${openid}`
+    return { title: '来看看我给你准备的菜单，挑几道吧！', path }
   },
 
   getDecisionCandidates() {

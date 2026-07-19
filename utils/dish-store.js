@@ -47,6 +47,7 @@ function normalizeDishes(dishes) {
       mealRole: dish.mealRole || inferMealRole(dish),
       tags: (dish.tags || []).slice(0, 2),
       ingredients: dish.ingredients || [],
+      lastCooked: dish.lastCooked || 0,
       createdAt: dish.createdAt || 0,
       updatedAt: dish.updatedAt || 0,
     }
@@ -120,6 +121,7 @@ function toCloudData(dish) {
     mealRole: dish.mealRole || '',
     tags: dish.tags || [],
     ingredients: dish.ingredients || [],
+    lastCooked: dish.lastCooked || 0,
     createdAt: dish.createdAt || Date.now(),
     updatedAt: dish.updatedAt || Date.now(),
   }
@@ -231,6 +233,44 @@ async function saveDish(dish) {
   return nextDish
 }
 
+/**
+ * 批量导入菜谱：本地即时写入（秒开），云端并行后台保存。
+ * 用名字型稳定 id，配合调用方跳过同名，避免重复。返回合并后的列表。
+ */
+function saveDishesBatch(rawDishes) {
+  const now = Date.now()
+  const incoming = (rawDishes || [])
+    .filter(d => d && d.name)
+    .map(d => ({
+      ...d,
+      id: String(d.id || ('d-' + d.name)),
+      coverImage: d.coverImage || '',
+      createdAt: d.createdAt || now,
+      updatedAt: now,
+    }))
+
+  const merged = setCachedDishes([...getCachedDishes(), ...incoming])
+
+  if (incoming.length && initCloud()) {
+    wx.setStorageSync(CLOUD_MIGRATED_KEY, true)
+    Promise.all(
+      incoming.map(d => saveCloudDish(d).catch(err => console.warn('cloud save dish fail', d.name, err)))
+    ).catch(() => {})
+  }
+  return merged
+}
+
+// 做完菜：给这些菜写 lastCooked（本地即时 + 云端后台），供"不重复推荐"降权
+function markCooked(ids) {
+  const set = new Set((ids || []).map(String))
+  if (!set.size) return getCachedDishes()
+  const now = Date.now()
+  const toSave = getCachedDishes()
+    .filter(d => set.has(String(d.id)))
+    .map(d => ({ ...d, lastCooked: now }))
+  return toSave.length ? saveDishesBatch(toSave) : getCachedDishes()
+}
+
 async function deleteDish(id) {
   const cached = getCachedDishes()
   const dish = cached.find(item => String(item.id) === String(id))
@@ -254,6 +294,8 @@ module.exports = {
   getDishes,
   getCachedDishes,
   saveDish,
+  saveDishesBatch,
+  markCooked,
   deleteDish,
   normalizeDishes,
 }

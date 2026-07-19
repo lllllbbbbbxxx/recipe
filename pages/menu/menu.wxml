@@ -8,7 +8,8 @@
       <view class="shop-desc">TODAY'S MENU</view>
     </view>
     <view class="header-actions">
-      <view class="hbtn hbtn-orders" bindtap="goOrders">接单</view>
+      <view class="hbtn hbtn-share" bindtap="openShareSheet">分享</view>
+      <view class="hbtn hbtn-orders" bindtap="goOrders">点单</view>
       <view class="hbtn hbtn-fridge" bindtap="goFridge">冰箱</view>
       <view class="hbtn hbtn-add" bindtap="goAdd">+ 菜谱</view>
     </view>
@@ -48,6 +49,16 @@
 
   <!-- 菜谱列表 -->
   <scroll-view class="dish-list" scroll-y>
+    <!-- 菜谱少于 10 道：一键导入家常菜入口 -->
+    <view wx:if="{{showImportEntry}}" class="import-banner" bindtap="openDishGuide">
+      <view class="import-banner-icon">🍳</view>
+      <view class="import-banner-text">
+        <view class="import-banner-title">一键导入家常菜</view>
+        <view class="import-banner-sub">快速建立你的菜谱库</view>
+      </view>
+      <view class="import-banner-go">导入</view>
+    </view>
+
     <view wx:if="{{isDishListEmpty}}" class="empty">没有找到匹配的菜</view>
     <view wx:for="{{filteredDishes}}" wx:key="viewKey" class="swipe-item">
       <view class="swipe-actions">
@@ -113,7 +124,6 @@
     </view>
   </view>
 
-  <button class="share-menu-btn" open-type="share">📤 分享菜单给朋友点单</button>
   <view wx:if="{{isCartEmpty}}" class="cart-empty">点击菜谱右侧 + 加入菜单</view>
 
   <view wx:else>
@@ -134,10 +144,109 @@
         <text class="ing-amount">{{item.amount}}</text>
       </view>
     </view>
+
+    <view class="cook-done-btn" bindtap="openConsume">🍽️ 做完了 · 扣减库存</view>
   </view>
 </view>
 
 <!-- 遮罩 -->
 <view class="overlay {{showCart ? 'show' : ''}}" bindtap="toggleCartPanel"></view>
+
+<!-- 选择要分享的菜 -->
+<view wx:if="{{showShareSheet}}" class="guide-mask" bindtap="closeShareSheet">
+  <view class="guide-panel" catchtap>
+    <view class="share-sheet-head">
+      <view>
+        <view class="guide-title">分享菜单</view>
+        <view class="guide-sub">勾选这次要给对方的菜，好友只看到这些</view>
+      </view>
+      <view class="share-all-btn" bindtap="toggleShareAll">{{shareAllOn ? '全不选' : '全选'}}</view>
+    </view>
+    <scroll-view class="guide-scroll" scroll-y>
+      <view
+        wx:for="{{shareDishItems}}"
+        wx:key="id"
+        class="guide-dish {{item.selected ? 'on' : ''}}"
+        bindtap="toggleShareDish"
+        data-index="{{index}}"
+      >
+        <view class="guide-check {{item.selected ? 'on' : ''}}">{{item.selected ? '✓' : ''}}</view>
+        <view class="guide-dish-info">
+          <view class="guide-dish-name">{{item.name}}</view>
+          <view wx:if="{{item.mealRole}}" class="guide-dish-sub">{{item.mealRole}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="share-sheet-actions">
+      <view class="guide-cancel" bindtap="goShares">分享记录</view>
+      <button wx:if="{{shareSelectedCount}}" class="guide-confirm share-confirm" open-type="share" bindtap="prepareShare">分享给朋友</button>
+      <view wx:else class="guide-confirm share-confirm share-disabled" bindtap="shareNoneTip">分享给朋友</view>
+    </view>
+  </view>
+</view>
+
+<!-- 一键导入家常菜 引导弹层 -->
+<view wx:if="{{showDishGuide}}" class="guide-mask" bindtap="closeDishGuide">
+  <view class="guide-panel" catchtap>
+    <view class="guide-title">导入家常菜</view>
+    <view class="guide-sub">勾选想要的菜，点「导入」加进你的菜谱库</view>
+    <scroll-view class="guide-scroll" scroll-y>
+      <view
+        wx:for="{{dishGuideItems}}"
+        wx:key="name"
+        class="guide-dish {{item.selected ? 'on' : ''}} {{item.exists ? 'exists' : ''}}"
+        bindtap="toggleDishGuideItem"
+        data-index="{{index}}"
+      >
+        <view class="guide-check {{item.selected ? 'on' : ''}}">{{item.selected ? '✓' : ''}}</view>
+        <view class="guide-dish-info">
+          <view class="guide-dish-name">{{item.name}}<text wx:if="{{item.exists}}" class="guide-exists-tag">已有</text></view>
+          <view class="guide-dish-sub">{{item.mealRole}} · {{item.ingredientText}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="guide-actions">
+      <view class="guide-cancel" bindtap="closeDishGuide">取消</view>
+      <view class="guide-confirm" bindtap="importDishes">导入</view>
+    </view>
+  </view>
+</view>
+
+<!-- 做完菜 · 按量扣减库存 -->
+<view wx:if="{{showConsume}}" class="guide-mask" bindtap="closeConsume">
+  <view class="guide-panel" catchtap>
+    <view class="guide-title">做完这顿了？</view>
+    <view class="guide-sub">按实际用量扣减，常备调料不算，适量的不扣</view>
+    <scroll-view class="guide-scroll" scroll-y>
+      <view wx:for="{{consumeItems}}" wx:key="id" class="consume-item">
+        <view class="consume-head">
+          <text class="consume-name">{{item.name}}</text>
+          <text class="consume-have">现有 {{item.amountText || '未填量'}}</text>
+        </view>
+        <!-- 计数：用了几个 -->
+        <view wx:if="{{item.type === 'count'}}" class="consume-count">
+          <text class="consume-label">用了</text>
+          <input class="consume-num" type="digit" value="{{item.usedQty}}" data-index="{{index}}" bindinput="onConsumeUsed" />
+          <text class="consume-label">{{item.unit}}</text>
+        </view>
+        <!-- 重量：选比例 -->
+        <view wx:elif="{{item.type === 'weight'}}" class="consume-modes">
+          <view class="cmode {{item.mode==='half'?'on':''}}" data-index="{{index}}" data-mode="half" bindtap="setConsumeMode">用了一半</view>
+          <view class="cmode {{item.mode==='quarter'?'on':''}}" data-index="{{index}}" data-mode="quarter" bindtap="setConsumeMode">用了1/4</view>
+          <view class="cmode {{item.mode==='all'?'on':''}}" data-index="{{index}}" data-mode="all" bindtap="setConsumeMode">用完</view>
+          <view class="cmode {{item.mode==='none'?'on':''}}" data-index="{{index}}" data-mode="none" bindtap="setConsumeMode">不扣</view>
+          <input class="consume-custom {{item.mode==='custom'?'on':''}}" type="digit" placeholder="自定义{{item.unit}}" value="{{item.customQty}}" data-index="{{index}}" bindinput="onConsumeCustom" />
+        </view>
+        <!-- 适量/没填量：不扣 -->
+        <view wx:else class="consume-vague">适量 / 没填量 · 不扣</view>
+      </view>
+      <view wx:if="{{!consumeItems.length}}" class="mine-empty">今日菜单没有对应的冰箱食材可扣</view>
+    </scroll-view>
+    <view class="guide-actions">
+      <view class="guide-cancel" bindtap="closeConsume">取消</view>
+      <view class="guide-confirm" bindtap="confirmConsume">扣减并清空菜单</view>
+    </view>
+  </view>
+</view>
 
 </view>
